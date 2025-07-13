@@ -15,7 +15,12 @@ def generate_document():
     unit_weight = weight_label_to_value.get(weight_var.get(), "")
     selected_label = route_var.get().strip()
     route_value = route_label_to_value.get(selected_label, "")
-    
+    fwd_draft = fwd_draft_entry.get().strip()
+    mid_draft = mid_draft_entry.get().strip()
+    aft_draft = aft_draft_entry.get().strip()
+
+
+
     vessel_label = vessel_var.get().strip()
     vessel_value = vessel_label_to_value.get(vessel_label, "")
 
@@ -31,7 +36,12 @@ def generate_document():
     vert_value = "1"
     gmmt_value = "1"
     disp = ltsh_lcg = ltsh_tcg = ltsh_vcg = ""
-    lcg = tcg = vcg = ""
+
+    # Safe defaults in case there are no initial weights
+    initial_wt_lcg = ""
+    initial_wt_tcg = ""
+    initial_wt_vcg = ""
+
 
     if survey_label in ["Deadweight Survey", "Inclining Experiment"]:
         excel_data = excel_text.get("1.0", tk.END).strip()
@@ -63,11 +73,11 @@ def generate_document():
         item = row["item"].get().strip()
         weight = row["weight"].get().strip()
         units = row["units"].get().strip().upper()
-        lcg = row["lcg"].get().strip()
-        tcg = row["tcg"].get().strip()
-        vcg = row["vcg"].get().strip()
+        initial_wt_lcg = row["initial_wt_lcg"].get().strip()
+        initial_wt_tcg = row["initial_wt_tcg"].get().strip()
+        initial_wt_vcg = row["initial_wt_vcg"].get().strip()
 
-        if not action or not item or not weight or not lcg or not tcg or not vcg or units not in grouped_by_units:
+        if not action or not item or not weight or not initial_wt_lcg or not initial_wt_tcg or not initial_wt_vcg or units not in grouped_by_units:
             continue
 
         # Negate weight for ADD, leave it for REMOVE
@@ -81,14 +91,14 @@ def generate_document():
         except ValueError:
             continue  # skip invalid weight input
 
-        grouped_by_units[units].append((item, weight_str, lcg, tcg, vcg))
+        grouped_by_units[units].append((item, weight_str, initial_wt_lcg, initial_wt_tcg, initial_wt_vcg))
 
     # Build output
     for unit, rows in grouped_by_units.items():
         if rows:
             initial_weights_block += f"UNITS {unit}\n"
-            for item, weight, lcg, tcg, vcg in rows:
-                initial_weights_block += f'ADD "{item}" {weight} {lcg} {tcg} {vcg}\n'
+            for item, weight, initial_wt_lcg, initial_wt_tcg, initial_wt_vcg in rows:
+                initial_weights_block += f'ADD "{item}" {weight} {initial_wt_lcg} {initial_wt_tcg} {initial_wt_vcg}\n'
 
     # === Prepare Initial Tanks Block ===
     initial_tanks_block = ""
@@ -102,6 +112,15 @@ def generate_document():
         initial_tanks_block += f"TANK {tank_name}\n"
         initial_tanks_block += f"CONTENTS {sg}\n"
         initial_tanks_block += f"LOAD ({tank_name}) {load}\n\n"
+
+# === PASSENGER INFO ===
+    paxct = pax_count_entry.get().strip()
+    paxwt = pax_weight_entry.get().strip()
+    paxlcg = pax_lcg_entry.get().strip()
+    paxtcg = pax_tcg_entry.get().strip()
+    paxvcg = pax_vcg_entry.get().strip()
+
+
 
 
     # Define your templates and output filenames
@@ -126,6 +145,9 @@ def generate_document():
             .replace("{{sg}}", sg_value)
             .replace("{{unit_length}}", unit_length)
             .replace("{{unit_weight}}", unit_weight)
+            .replace("{{fwddrloc}}", fwd_draft)
+            .replace("{{middrloc}}", mid_draft)
+            .replace("{{aftdrloc}}", aft_draft)
             .replace("{{route}}", route_value)
             .replace("{{vessel}}", vessel_value)
             .replace("{{option}}", survey_value)
@@ -137,11 +159,17 @@ def generate_document():
             .replace("{{ltsh_lcg}}", ltsh_lcg)
             .replace("{{ltsh_tcg}}", ltsh_tcg)
             .replace("{{ltsh_vcg}}", ltsh_vcg)
-            .replace("{{lcg}}", lcg)
-            .replace("{{tcg}}", tcg)
-            .replace("{{vcg}}", vcg)
+            .replace("{{initial_wt_lcg}}", initial_wt_lcg)
+            .replace("{{initial_wt_tcg}}", initial_wt_tcg)
+            .replace("{{initial_wt_vcg}}", initial_wt_vcg)
             .replace("{{initial_weights}}", initial_weights_block.strip())
             .replace("{{initial_tanks}}", initial_tanks_block.strip())
+            .replace("{{paxct}}", paxct)
+            .replace("{{paxwt}}", paxwt)
+            .replace("{{paxlcg}}", paxlcg)
+            .replace("{{paxtcg}}", paxtcg)
+            .replace("{{paxvcg}}", paxvcg)
+
         )
 
 
@@ -184,25 +212,51 @@ tk.Label(tab_report, text="Specific Gravity:").pack(pady=(10, 0))
 sg_dropdown = ttk.Combobox(tab_report, textvariable=sg_var, values=list(sg_label_to_value.keys()), state="readonly")
 sg_dropdown.pack()
 
+# Report Units
+tk.Label(tab_report, text="Report Units", font=("Arial", 10, "bold")).pack(pady=(20, 0))
+
+units_frame = tk.Frame(tab_report)
+units_frame.pack(pady=5)
+
 # Length Units
+tk.Label(units_frame, text="Length:").grid(row=0, column=0, padx=10)
 length_var = tk.StringVar(value="Feet")
 length_label_to_value = {
     "Feet": "F",
     "Meters": "M"
 }
-tk.Label(tab_report, text="Length Units:").pack(pady=(10, 0))
-length_dropdown = ttk.Combobox(tab_report, textvariable=length_var, values=list(length_label_to_value.keys()), state="readonly")
-length_dropdown.pack()
+length_dropdown = ttk.Combobox(units_frame, textvariable=length_var, values=list(length_label_to_value.keys()), state="readonly", width=10)
+length_dropdown.grid(row=1, column=0, padx=10)
 
 # Weight Units
+tk.Label(units_frame, text="Weight:").grid(row=0, column=1, padx=10)
 weight_var = tk.StringVar(value="Long Tons")
 weight_label_to_value = {
     "Pounds": "LB",
     "Long Tons": "LT"
 }
-tk.Label(tab_report, text="Weight Units:").pack(pady=(10, 0))
-weight_dropdown = ttk.Combobox(tab_report, textvariable=weight_var, values=list(weight_label_to_value.keys()), state="readonly")
-weight_dropdown.pack()
+weight_dropdown = ttk.Combobox(units_frame, textvariable=weight_var, values=list(weight_label_to_value.keys()), state="readonly", width=10)
+weight_dropdown.grid(row=1, column=1, padx=10)
+
+
+# === DRAFT LOCATIONS ===
+tk.Label(tab_report, text="Draft Locations", font=("Arial", 10, "bold")).pack(pady=(20, 5))
+
+draft_frame = tk.Frame(tab_report)
+draft_frame.pack()
+
+tk.Label(draft_frame, text="Forward").grid(row=0, column=0, padx=10)
+tk.Label(draft_frame, text="Midships").grid(row=0, column=1, padx=10)
+tk.Label(draft_frame, text="Aft").grid(row=0, column=2, padx=10)
+
+fwd_draft_entry = tk.Entry(draft_frame, width=12)
+mid_draft_entry = tk.Entry(draft_frame, width=12)
+aft_draft_entry = tk.Entry(draft_frame, width=12)
+
+fwd_draft_entry.grid(row=1, column=0, padx=10)
+mid_draft_entry.grid(row=1, column=1, padx=10)
+aft_draft_entry.grid(row=1, column=2, padx=10)
+
 
 # === TAB 2: Lightship ===
 tab_lightship = tk.Frame(notebook)
@@ -301,9 +355,9 @@ def add_weight_row():
         "item": tk.Entry(weights_frame, width=12),
         "weight": tk.Entry(weights_frame, width=8),
         "units": ttk.Combobox(weights_frame, values=["LB", "LT"], width=6, state="readonly"),
-        "lcg": tk.Entry(weights_frame, width=8),
-        "tcg": tk.Entry(weights_frame, width=8),
-        "vcg": tk.Entry(weights_frame, width=8)
+        "initial_wt_lcg": tk.Entry(weights_frame, width=8),
+        "initial_wt_tcg": tk.Entry(weights_frame, width=8),
+        "initial_wt_vcg": tk.Entry(weights_frame, width=8)
     }
     row_data["action"].set("ADD")
     row_data["units"].set("LB")
@@ -312,9 +366,9 @@ def add_weight_row():
     row_data["item"].grid(row=row_idx, column=1, padx=2)
     row_data["weight"].grid(row=row_idx, column=2, padx=2)
     row_data["units"].grid(row=row_idx, column=3, padx=2)
-    row_data["lcg"].grid(row=row_idx, column=4, padx=2)
-    row_data["tcg"].grid(row=row_idx, column=5, padx=2)
-    row_data["vcg"].grid(row=row_idx, column=6, padx=2)
+    row_data["initial_wt_lcg"].grid(row=row_idx, column=4, padx=2)
+    row_data["initial_wt_tcg"].grid(row=row_idx, column=5, padx=2)
+    row_data["initial_wt_vcg"].grid(row=row_idx, column=6, padx=2)
 
     def delete_row():
         for widget in row_data.values():
@@ -419,7 +473,39 @@ tank_button.grid(row=1, column=0, columnspan=4, pady=5)
 # === TAB 3: Loads ===
 tab_loads = tk.Frame(notebook)
 notebook.add(tab_loads, text="Loads")
-tk.Label(tab_loads, text="Loads tab content TBD").pack(pady=20)
+
+# === PASSENGERS SECTION ===
+tk.Label(tab_loads, text="Passengers:", font=("Arial", 10, "bold")).pack(pady=(20, 5))
+
+# Number of Passengers
+tk.Label(tab_loads, text="Number of Passengers:").pack()
+pax_count_entry = tk.Entry(tab_loads, width=10)
+pax_count_entry.pack()
+
+# Passenger Weight
+tk.Label(tab_loads, text="Weight per Passenger (lbs):").pack()
+pax_weight_entry = tk.Entry(tab_loads, width=10)
+pax_weight_entry.insert(0, "185")
+pax_weight_entry.pack()
+
+# Passenger Location (LCG, TCG, VCG)
+tk.Label(tab_loads, text="Passenger Location:").pack(pady=(10, 0))
+pax_loc_frame = tk.Frame(tab_loads)
+pax_loc_frame.pack(pady=(0, 10))
+
+tk.Label(pax_loc_frame, text="LCG").grid(row=0, column=0, padx=10)
+tk.Label(pax_loc_frame, text="TCG").grid(row=0, column=1, padx=10)
+tk.Label(pax_loc_frame, text="VCG").grid(row=0, column=2, padx=10)
+
+pax_lcg_entry = tk.Entry(pax_loc_frame, width=10)
+pax_tcg_entry = tk.Entry(pax_loc_frame, width=10)
+pax_vcg_entry = tk.Entry(pax_loc_frame, width=10)
+
+pax_lcg_entry.grid(row=1, column=0, padx=10)
+pax_tcg_entry.grid(row=1, column=1, padx=10)
+pax_vcg_entry.grid(row=1, column=2, padx=10)
+
+
 
 # === TAB 4: Intact Stability ===
 tab_stab = tk.Frame(notebook)

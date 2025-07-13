@@ -5,10 +5,10 @@ RUN load.rf /call
    set LENGTH = 30		`LBP IN FEET
 `=== Select Route ==============================================
    `set ROUTE = "PROTECT", "PARTIAL", "EXPOSED"
-   set ROUTE = PARTIAL `This is set by the GUI
+   set ROUTE = EXPOSED `This is set by the GUI
 `=== Select Vessel Type ========================================
    `set VESSEL = POWER, PONTOON, RHIB, MONOSAIL, CATSAIL
-   set VESSEL = RHIB ` This is set by the GUI
+   set VESSEL = PONTOON ` This is set by the GUI
 `=== Sail Area =================================================
 `ZERO IF MODEL INCLUDE FULL PROFILE AREA
    set AREA = 268					`PROFILE AREA IN SQUARE FEET

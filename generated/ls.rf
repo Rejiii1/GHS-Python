@@ -1,6 +1,6 @@
 weight CLEAR
 echo OFF
-READ asd
+READ hulkl
 run macro.lib /call
 
 `----------SET VARIABLES----------
@@ -8,23 +8,22 @@ UNITS F		`SETS THE UNIT FOR INPUT
 UNITS LT		`SETS THE UNIT FOR INPUT
 `===============================================================
 	set UNITREPORT 	= LT	`SETS THE UNITS FOR REPORT OUT
-	set TESTWTR		= 1.000				`MEASURED SPEC GRAV FOR WATER AT TEST
+	set TESTWTR		= 1.000				`MEASURED SPEC GRAV FOR WATER AT TEST - changed in excel paste
 	set SG 			= 1.025			`SPECIFIC GRAV FOR WATER FOR ANALYSIS (1.025 OR 1.00)
-	set OPTION		= 3		`1 DEADWEIGHT - 2 INCLINING - 3 USER LIGHTSHIP
+	set OPTION		= 1		`1 DEADWEIGHT - 2 INCLINING - 3 USER LIGHTSHIP
 	set VERT		= 1			`NEED FOR OPTION 1 - CONSERVATIVE VCG SET FOR DEADWEIGHT
 	set GMMT		= 1			`NEED FOR OPTION 2 - FROM MOMTAN TAB OF SPREADSHEET "a" (ft-LT) for INCLINING
 `=========Draft Locations=========================================
-	set FWDDRLOC = 30F
-	set MIDDRLOC = 15f		`QUERY MODEL TO FIND DRAFTS AT THESE 3 LOCATIONS
-	set AFTDRLOC = 0A
+	set FWDDRLOC = 1		`QUERY MODEL TO FIND DRAFTS AT THESE 3 LOCATIONS
+	set MIDDRLOC = 2		
+	set AFTDRLOC = 3		
 `=======OPTION 1 or 2 - Paste Excel for Survey Here===============
- `This is set by the GUI
+1 `This is set by the GUI
 `=======OPTION 3 - For user lightship set here====================
 MACRO KNOWNLTSH	
 .ZERO
-UNITS LB
-WEIGHT a a s d	`Known lightship weight, LCG, TCG, VCG set by GUI
-`WEIGHT 2.59 10.70f 0.25s 4.521	`SET THE KNONN LIGHTSHIP WIEHGT LCG TCG VCG
+
+   	`Known lightship weight, LCG, TCG, VCG set by GUI
 UNITS {UNITREPORT}
 SOLVE
 /
@@ -36,29 +35,7 @@ MACRO INITIALWEIGHTS
 
 `-----------------------TANK CONDITIONS-------------------------
 Macro INITIALTANKS
-TANK gas1
-CONTENTS 0.74
-LOAD (gas1) 1
-
-TANK gas2
-CONTENTS 0.74
-LOAD (gas2) 2
-
-TANK water1
-CONTENTS 1.00
-LOAD (water1) 1.00
-
-TANK other1
-CONTENTS 999
-LOAD (other1) 1999
-
-TANK water2
-CONTENTS 1.00
-LOAD (water2) 2.00 `Initial tanks block set by GUI
-
-`TANK TANK2
-`CONTENTS GAS
-`LOAD (TANK3) .418
+ `Initial tanks block set by GUI
 /
 `===============================================================
 .LTSHRPRT
