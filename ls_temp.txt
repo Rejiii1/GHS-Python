@@ -1,0 +1,47 @@
+weight CLEAR
+echo OFF
+READ {{hull}}
+run macro.lib /call
+
+`----------SET VARIABLES----------
+UNITS F			`SETS THE UNIT FOR INPUT
+UNITS LB		`SETS THE UNIT FOR INPUT
+`===============================================================
+	set UNITREPORT 	= LT		`SETS THE UNITS FOR REPORT OUT
+	set TESTWTR		= 1.000		`MEASURED SPEC GRAV FOR WATER AT TEST
+	set SG 			= 1.025		`SPECIFIC GRAV FOR WATER FOR ANALYSIS (1.025 OR 1.00)
+	set OPTION		= {{option}}	`1 DEADWEIGHT - 2 INCLINING - 3 USER LIGHTSHIP
+	set VERT		= {{vert}}		`NEED FOR OPTION 1 - CONSERVATIVE VCG SET FOR DEADWEIGHT
+	set GMMT		= {{gmmt}}		`NEED FOR OPTION 2 - FROM MOMTAN TAB OF SPREADSHEET "a" (ft-LT) for INCLINING
+`=========Draft Locations=========================================
+	set FWDDRLOC = 30F
+	set MIDDRLOC = 15f		`QUERY MODEL TO FIND DRAFTS AT THESE 3 LOCATIONS
+	set AFTDRLOC = 0A
+`=======OPTION 1 or 2 - Paste Excel for Survey Here===============
+{{excel_paste}} `This is set by the GUI
+`=======OPTION 3 - For user lightship set here====================
+MACRO KNOWNLTSH	
+.ZERO
+{{user_lightship_units}}
+{{disp}} {{ltsh_lcg}} {{ltsh_tcg}} {{ltsh_vcg}}	`Known lightship weight, LCG, TCG, VCG set by GUI
+`WEIGHT 2.59 10.70f 0.25s 4.521	`SET THE KNONN LIGHTSHIP WIEHGT LCG TCG VCG
+UNITS {UNITREPORT}
+SOLVE
+/
+`===============================================================
+`------------ADD/REMOVE THE INITIAL WEIGHTS FROM LTSH-----------
+MACRO INITIALWEIGHTS
+{{initial_weights}} `Initial weights block set by GUI
+/
+Macro INITIALTANKS
+`-----------------------TANK CONDITIONS-------------------------
+TANK FO.P			`Selects the tank we want to adjust
+CONTENTS GAS		`Sets the content of the selected tank
+LOAD (FO.P) .181	`Sets percent full of tank
+
+`TANK TANK2
+`CONTENTS GAS
+`LOAD (TANK3) .418
+/
+`===============================================================
+.LTSHRPRT

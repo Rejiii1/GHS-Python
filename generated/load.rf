@@ -1,0 +1,71 @@
+Clear
+run ls.rf /call /quiet
+`===============================================================
+	set PAXCT	= 18		`Max number of Passengers
+	set PAXWT	= 185		`Avg Pax Weight
+`--------Locations-----------
+	set PAXLCG	= 15f		`LCG of Normal Pax loading
+	set PAXTCG	= 0.00		`TCG of Noramal Pax
+	set PAXVCG	= 6.769		`VCG of Normal Pax
+`===============================================================
+`----------SET UP TANK CONTENTS---------- `USUALLY DON'T NEED THIS SECTION UNLESS CONTESTING TANK CONTENTS IN SUBMISSION
+`SET TANK CONTENTS SP GRAVITY	`NEED TO COMMENT OUT TANKS THAT DON'T APPLY HERE
+CONTENTS (FO.P) GASOLINE		`THE ASTERIX SETS ANY TANK THAT STARTS WITH FO TO 0.87
+`CONTENTS (GAS*) .74
+`CONTENTS (FW*) 1.0		
+`CONTENTS (SEW*) 1.025
+`CONTENTS (BAIT) 1.025
+`CONTENTS (BW) 1.025
+`----------SET PERMEABILITY OF TANKS TO 0.98----------
+PERM (*) 0.98
+`----------Set names of FSM Tanks---------------------
+ set FSMTanks = "(FO* FW* BW*)"
+`===============================================================
+`----------Added Stuff (Every LC)------------
+MACRO ADDSTUFF
+`UNITS LT	
+`  add "Ballast Plate P" 	0.09	29.042f	2.50p	4.521	`both ballast are to port and conserve at VCG
+UNIT LB
+  add "CAPT (1)"					185 	13.250f	2.921s	6.769
+  add "CREW (1)"					185	15f		0.00		6.769
+/
+`----------Tank Conditions---------------
+`-----Departure Tanks-----
+MACRO TANK1
+`LOAD (TANK) %
+LOAD (FO.P) .95
+LOAD (FW*) .95
+LOAD (BW*) 0
+/
+`-----Midway Tanks-----
+MACRO TANK2
+`LOAD (TANK) %
+LOAD (FO.P) .5
+LOAD (FW*)  .5
+LOAD (BW*)  .5
+/
+`-----Arrival Tanks-----
+MACRO TANK3
+LOAD (FO.P) .1
+LOAD (FW*)  .1
+LOAD (BW*)  .95
+/
+`=== Extra Load Cases Here ========================================
+`----------LOAD CONDITION 5 (If Needed)----------
+`MACRO LC5
+`DELETE ALL WEIGHT
+`WATER {SG}
+`\{+b}{+u}50-50 Consumables and Pax{-u}{-b}\
+`.LTSH
+`.ADDSTUFF		`Add all the normal stuff
+`UNITS LB		`UNITS FOR THE ENTERING LOADS BELOW
+`ADD "# PASSENGERS" WE LCG TCG VCG
+`ADD "100% Passengers ({PAXCT})" {HALFPW} {PAXLCG} {PAXTCG} {PAXVCG}
+`ADD "NAME" Weight LCG TCG VCG 	`Add load case specific weights here
+`.TANK1	
+`SOLVE				`THIS SOLVES FOR HYDROSTATICS FOR THIS CONDITION
+`.SOLVE
+`/
+`------------Load more below if needed------------
+
+.LOADRPRT

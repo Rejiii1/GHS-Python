@@ -1,0 +1,51 @@
+CLEAR
+RUN load.rf /call
+`===============================================================
+   set BEAM = 10			`BEAM IN FEET
+   set LENGTH = 30		`LBP IN FEET
+`=== Select Route ==============================================
+   `set ROUTE = "EXPOSED", "PARTIAL", "PROTECT"
+   set ROUTE = PARTIAL `This is set by the GUI
+`=== Select Vessel Type ========================================
+   `set VESSEL = POWER, PONTOON, RHIB, MONOSAIL, CATSAIL
+   set VESSEL = RHIB ` This is set by the GUI
+`=== Sail Area =================================================
+`ZERO IF MODEL INCLUDE FULL PROFILE AREA
+   set AREA = 268					`PROFILE AREA IN SQUARE FEET
+   set ARM_ABOVE_TO_BELOW_WL = 5.558	`DISTANCE FROM UNDERWATER CENTROID TO ABOVE WATER CENTROID
+`=== Rank Geometry =============================================
+`If no tanks exist in model change that 0 to the FSM from submission
+   set NOTANKSFS = 0
+`=== Downflooding Points =======================================
+MACRO CRITICAL
+CRIT (*) OFF
+`crt (1) "companionway" 32.5 1.33 3.833/flood/symmetrical
+`crt (2) "head vent" 30 -3.917 4/flood/symmetrical
+CRIT (*) REPORT
+/
+`===============================================================
+`IF SAIL and change MACRO GEOM
+`set CATBEAM = 24.402				`SAILCAT ONLY, DIST BTWN DEMI-HULL CL FOR 171.057
+`set AS = 1123					`MAXIMUM SAIL AREA SQFT
+`set HC = 27						`HEIGHT OF CENTER OF EFFORT FOR SAIL AREA ABOVE DECK
+`=== Set the RA Angles =========================================
+MACRO ANG			
+ANGLES 0 0.5 ... 90				`SET ANGLE INTERVAL HERE
+ANGLES *						`RUNS THE RIGHTING ARM CURVE IN THE DIRECTION OF ANY EXISTING LIST FOR WORST CASE SCENARIO
+RAH /LIM:ATT/NOGRAPH/FSM/NOTAB	`TELLS THE VESSEL TO HEEL OVER TO SPECIFIED ANGLES AND COMPUTES RIGHTING ENERGY AND ARM CHARACTERISTICS
+/								`NO TAB STANDS FOR NO TABLE - YOU CAN COMMENT THAT OUT TO PRINT
+
+.DECK_EDGE
+.CRITICAL
+.FREESURF
+SET COUNTER = 0
+`===============================================================
+TITLE INTACT CRITERIA
+SUBTITLE REJ
+REPORT INTACT /BOX:COLOR
+.INTACT
+IF {VESSEL} = "PONTOON" THEN .TOONTIME		`Runs through loading conditions of the pontoon pax 
+REPORT OFF
+PRINT INTACT.PF /PREVIEW					`THIS WILL SHOW ALL CONDITIONS
+IF {VESSEL} = "MONOSAIL" THEN .SAILRPT
+IF {VESSEL} = "RHIB" THEN .RHIB 			`Edit Macro.lib for comp names and selections
