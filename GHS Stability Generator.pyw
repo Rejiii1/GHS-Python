@@ -537,7 +537,7 @@ pax_vcg_entry.grid(row=1, column=2, padx=10)
 
 
 # === ADDITIONAL WEIGHTS SECTION ===
-tk.Label(tab_loads, text="Additional Weights:", font=("Arial", 10, "bold")).pack(pady=(20, 5))
+tk.Label(tab_loads, text="Additional Weights in Every Loadcase:", font=("Arial", 10, "bold")).pack(pady=(20, 5))
 
 add_weights_frame = tk.Frame(tab_loads)
 add_weights_frame.pack()
