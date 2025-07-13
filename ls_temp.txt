@@ -33,11 +33,10 @@ SOLVE
 MACRO INITIALWEIGHTS
 {{initial_weights}} `Initial weights block set by GUI
 /
-Macro INITIALTANKS
+
 `-----------------------TANK CONDITIONS-------------------------
-TANK FO.P			`Selects the tank we want to adjust
-CONTENTS GAS		`Sets the content of the selected tank
-LOAD (FO.P) .181	`Sets percent full of tank
+Macro INITIALTANKS
+{{initial_tanks}} `Initial tanks block set by GUI
 
 `TANK TANK2
 `CONTENTS GAS

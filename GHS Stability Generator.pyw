@@ -90,7 +90,18 @@ def generate_document():
             for item, weight, lcg, tcg, vcg in rows:
                 initial_weights_block += f'ADD "{item}" {weight} {lcg} {tcg} {vcg}\n'
 
+    # === Prepare Initial Tanks Block ===
+    initial_tanks_block = ""
 
+    for tank in initial_tanks:
+        tank_name = tank["name"].get().strip()
+        contents = tank["contents"].get().strip()
+        sg = tank["sg"].get().strip()
+        load = tank["load"].get().strip()
+
+        initial_tanks_block += f"TANK {tank_name}\n"
+        initial_tanks_block += f"CONTENTS {sg}\n"
+        initial_tanks_block += f"LOAD ({tank_name}) {load}\n\n"
 
 
     # Define your templates and output filenames
@@ -130,6 +141,7 @@ def generate_document():
             .replace("{{tcg}}", tcg)
             .replace("{{vcg}}", vcg)
             .replace("{{initial_weights}}", initial_weights_block.strip())
+            .replace("{{initial_tanks}}", initial_tanks_block.strip())
         )
 
 
@@ -320,6 +332,89 @@ def add_weight_row():
 
 add_button = tk.Button(weights_frame, text="➕ Add Initial Weight", command=add_weight_row)
 add_button.grid(row=1, column=0, columnspan=8, pady=5)
+
+# === INITIAL TANKS ===
+# Content types and their default specific gravity
+contents_to_sg = {
+    "Gasoline": "0.74",
+    "Fresh Water": "1.00",
+    "Sewage": "1.025",
+    "Diesel": "0.85",
+    "Bait": "1.025"
+}
+
+
+initial_tanks = []
+tank_header_created = False
+tanks_frame = tk.Frame(tab_lightship)
+tanks_frame.pack(pady=(20, 0))
+
+def reposition_tank_button():
+    row_idx = len(initial_tanks) + 1
+    tank_button.grid_forget()
+    tank_button.grid(row=row_idx, column=0, columnspan=4, pady=5)
+
+def add_tank_row():
+    global tank_header_created
+
+    if not tank_header_created:
+        header = ["Tank Name", "Contents", "Specific Gravity", "Load"]
+        for col, label in enumerate(header):
+            tk.Label(tanks_frame, text=label, font=("Arial", 10, "bold")).grid(row=0, column=col, padx=4, pady=2)
+        tank_header_created = True
+
+    row_idx = len(initial_tanks) + 1
+
+    name_entry = tk.Entry(tanks_frame, width=15)
+    contents_var = tk.StringVar()
+    contents_dropdown = ttk.Combobox(tanks_frame, textvariable=contents_var,
+                                     values=list(contents_to_sg.keys()) + ["Other"], state="readonly", width=12)
+    sg_entry = tk.Entry(tanks_frame, width=10)
+    load_entry = tk.Entry(tanks_frame, width=10)
+
+    def on_contents_change(*args):
+        selected = contents_var.get()
+        if selected in contents_to_sg:
+            sg_entry.config(state="normal")  # Temporarily enable to update text
+            sg_entry.delete(0, tk.END)
+            sg_entry.insert(0, contents_to_sg[selected])
+            sg_entry.config(state="disabled")  # Lock it again
+        else:
+            sg_entry.config(state="normal")  # Allow manual entry
+
+    contents_var.trace_add("write", on_contents_change)
+    contents_var.set("Gasoline")
+
+    name_entry.grid(row=row_idx, column=0, padx=2)
+    contents_dropdown.grid(row=row_idx, column=1, padx=2)
+    sg_entry.grid(row=row_idx, column=2, padx=2)
+    load_entry.grid(row=row_idx, column=3, padx=2)
+
+    def delete_tank_row():
+        for widget in (name_entry, contents_dropdown, sg_entry, load_entry, delete_btn):
+            widget.grid_forget()
+        initial_tanks.remove(row_data)
+        reposition_tank_button()
+
+    delete_btn = tk.Button(tanks_frame, text="❌", command=delete_tank_row, fg="red")
+    delete_btn.grid(row=row_idx, column=4, padx=2)
+
+    row_data = {
+        "name": name_entry,
+        "contents": contents_var,
+        "sg": sg_entry,
+        "load": load_entry,
+        "delete_btn": delete_btn
+    }
+
+    initial_tanks.append(row_data)
+    reposition_tank_button()
+
+
+tank_button = tk.Button(tanks_frame, text="➕ Add Initial Tank", command=add_tank_row)
+tank_button.grid(row=1, column=0, columnspan=4, pady=5)
+
+
 
 # === TAB 3: Loads ===
 tab_loads = tk.Frame(notebook)
