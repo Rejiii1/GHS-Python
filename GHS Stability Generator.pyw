@@ -10,6 +10,9 @@ def load_template():
 
 def generate_document():
     hull = name_entry.get().strip()
+    sg_value = sg_label_to_value.get(sg_var.get(), "")
+    unit_length = length_label_to_value.get(length_var.get(), "")
+    unit_weight = weight_label_to_value.get(weight_var.get(), "")
     selected_label = route_var.get().strip()
     route_value = route_label_to_value.get(selected_label, "")
     
@@ -109,6 +112,9 @@ def generate_document():
         filled_text = (
             template
             .replace("{{hull}}", hull)
+            .replace("{{sg}}", sg_value)
+            .replace("{{unit_length}}", unit_length)
+            .replace("{{unit_weight}}", unit_weight)
             .replace("{{route}}", route_value)
             .replace("{{vessel}}", vessel_value)
             .replace("{{option}}", survey_value)
@@ -151,9 +157,40 @@ notebook.pack(fill="both", expand=True)
 tab_report = tk.Frame(notebook)
 notebook.add(tab_report, text="Report Details")
 
-name_entry = tk.Entry(tab_report, width=40)
+# Geometry File Name
 tk.Label(tab_report, text="Geometry File Name:").pack(pady=(10, 0))
+name_entry = tk.Entry(tab_report, width=40)
 name_entry.pack()
+
+# Specific Gravity
+sg_var = tk.StringVar(value="Salt Water")
+sg_label_to_value = {
+    "Fresh Water": "1.000",
+    "Salt Water": "1.025"
+}
+tk.Label(tab_report, text="Specific Gravity:").pack(pady=(10, 0))
+sg_dropdown = ttk.Combobox(tab_report, textvariable=sg_var, values=list(sg_label_to_value.keys()), state="readonly")
+sg_dropdown.pack()
+
+# Length Units
+length_var = tk.StringVar(value="Feet")
+length_label_to_value = {
+    "Feet": "F",
+    "Meters": "M"
+}
+tk.Label(tab_report, text="Length Units:").pack(pady=(10, 0))
+length_dropdown = ttk.Combobox(tab_report, textvariable=length_var, values=list(length_label_to_value.keys()), state="readonly")
+length_dropdown.pack()
+
+# Weight Units
+weight_var = tk.StringVar(value="Long Tons")
+weight_label_to_value = {
+    "Pounds": "LB",
+    "Long Tons": "LT"
+}
+tk.Label(tab_report, text="Weight Units:").pack(pady=(10, 0))
+weight_dropdown = ttk.Combobox(tab_report, textvariable=weight_var, values=list(weight_label_to_value.keys()), state="readonly")
+weight_dropdown.pack()
 
 # === TAB 2: Lightship ===
 tab_lightship = tk.Frame(notebook)

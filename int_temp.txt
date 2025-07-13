@@ -4,7 +4,7 @@ RUN load.rf /call
    set BEAM = 10			`BEAM IN FEET
    set LENGTH = 30		`LBP IN FEET
 `=== Select Route ==============================================
-   `set ROUTE = "EXPOSED", "PARTIAL", "PROTECT"
+   `set ROUTE = "PROTECT", "PARTIAL", "EXPOSED"
    set ROUTE = {{route}} `This is set by the GUI
 `=== Select Vessel Type ========================================
    `set VESSEL = POWER, PONTOON, RHIB, MONOSAIL, CATSAIL
