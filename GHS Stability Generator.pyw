@@ -18,7 +18,7 @@ def generate_document():
     fwd_draft = fwd_draft_entry.get().strip()
     mid_draft = mid_draft_entry.get().strip()
     aft_draft = aft_draft_entry.get().strip()
-
+    global initial_weights, add_weights
 
 
     vessel_label = vessel_var.get().strip()
@@ -82,12 +82,12 @@ def generate_document():
 
         # Negate weight for ADD, leave it for REMOVE
         try:
-            weight_value = float(weight)
+            weight_str = weight.strip()
             if action == "ADD":
-                weight_value = -abs(weight_value)
+                if not weight_str.startswith("-"):
+                    weight_str = f"-{weight_str}"
             else:
-                weight_value = abs(weight_value)
-            weight_str = f"{weight_value:.2f}"
+                weight_str = weight_str.lstrip("-")
         except ValueError:
             continue  # skip invalid weight input
 
@@ -120,6 +120,34 @@ def generate_document():
     paxtcg = pax_tcg_entry.get().strip()
     paxvcg = pax_vcg_entry.get().strip()
 
+    # === ADDITIONAL WEIGHTS BLOCK ===
+    addstuff_block = ""
+    grouped_add_by_units = {"LB": [], "LT": []}
+
+    for row in add_weights:
+        item = row["item"].get().strip()
+        weight = row["weight"].get().strip()
+        units = row["units"].get().strip().upper()
+        lcg = row["lcg"].get().strip()
+        tcg = row["tcg"].get().strip()
+        vcg = row["vcg"].get().strip()
+
+        if not item or not weight or not lcg or not tcg or not vcg or units not in grouped_add_by_units:
+            continue
+
+        try:
+            weight_str = weight.strip()
+        except ValueError:
+            continue  # skip invalid
+
+        grouped_add_by_units[units].append((item, weight_str, lcg, tcg, vcg))
+
+    # Format grouped
+    for unit, rows in grouped_add_by_units.items():
+        if rows:
+            addstuff_block += f"UNITS {unit}\n"
+            for item, weight, lcg, tcg, vcg in rows:
+                addstuff_block += f'ADD "{item}" {weight} {lcg} {tcg} {vcg}\n'
 
 
 
@@ -169,6 +197,7 @@ def generate_document():
             .replace("{{paxlcg}}", paxlcg)
             .replace("{{paxtcg}}", paxtcg)
             .replace("{{paxvcg}}", paxvcg)
+            .replace("{{addstuff}}", addstuff_block.strip())
 
         )
 
@@ -182,6 +211,7 @@ def generate_document():
     root.destroy()
 
 initial_weights = []
+add_weights = []
 
 
 # GUI setup
@@ -504,6 +534,65 @@ pax_vcg_entry = tk.Entry(pax_loc_frame, width=10)
 pax_lcg_entry.grid(row=1, column=0, padx=10)
 pax_tcg_entry.grid(row=1, column=1, padx=10)
 pax_vcg_entry.grid(row=1, column=2, padx=10)
+
+
+# === ADDITIONAL WEIGHTS SECTION ===
+tk.Label(tab_loads, text="Additional Weights:", font=("Arial", 10, "bold")).pack(pady=(20, 5))
+
+add_weights_frame = tk.Frame(tab_loads)
+add_weights_frame.pack()
+
+add_header_created = False
+
+def reposition_add_load_button():
+    row_idx = len(add_weights) + 1
+    add_load_button.grid_forget()
+    add_load_button.grid(row=row_idx, column=0, columnspan=6, pady=5)
+
+def add_load_row():
+    global add_header_created
+
+    if not add_header_created:
+        headers = ["Item Name", "Weight", "Units", "LCG", "TCG", "VCG"]
+        for col, label in enumerate(headers):
+            tk.Label(add_weights_frame, text=label, font=("Arial", 10, "bold")).grid(row=0, column=col, padx=4, pady=2)
+        add_header_created = True
+
+    row_idx = len(add_weights) + 1
+
+    row_data = {
+        "item": tk.Entry(add_weights_frame, width=12),
+        "weight": tk.Entry(add_weights_frame, width=8),
+        "units": ttk.Combobox(add_weights_frame, values=["LB", "LT"], width=6, state="readonly"),
+        "lcg": tk.Entry(add_weights_frame, width=8),
+        "tcg": tk.Entry(add_weights_frame, width=8),
+        "vcg": tk.Entry(add_weights_frame, width=8)
+    }
+    row_data["units"].set("LT")
+
+    row_data["item"].grid(row=row_idx, column=0, padx=2)
+    row_data["weight"].grid(row=row_idx, column=1, padx=2)
+    row_data["units"].grid(row=row_idx, column=2, padx=2)
+    row_data["lcg"].grid(row=row_idx, column=3, padx=2)
+    row_data["tcg"].grid(row=row_idx, column=4, padx=2)
+    row_data["vcg"].grid(row=row_idx, column=5, padx=2)
+
+    def delete_load_row():
+        for widget in row_data.values():
+            widget.grid_forget()
+        delete_btn.grid_forget()
+        add_weights.remove(row_data)
+        reposition_add_load_button()
+
+    delete_btn = tk.Button(add_weights_frame, text="❌", command=delete_load_row, fg="red")
+    delete_btn.grid(row=row_idx, column=6, padx=2)
+    row_data["delete_btn"] = delete_btn
+
+    add_weights.append(row_data)
+    reposition_add_load_button()
+
+add_load_button = tk.Button(add_weights_frame, text="➕ Add Weight", command=add_load_row)
+add_load_button.grid(row=1, column=0, columnspan=6, pady=5)
 
 
 

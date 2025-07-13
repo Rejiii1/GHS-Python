@@ -23,11 +23,7 @@ PERM (*) 0.98
 `===============================================================
 `----------Added Stuff (Every LC)------------
 MACRO ADDSTUFF
-`UNITS LT	
-`  add "Ballast Plate P" 	0.09	29.042f	2.50p	4.521	`both ballast are to port and conserve at VCG
-UNIT LB
-  add "CAPT (1)"					185 	13.250f	2.921s	6.769
-  add "CREW (1)"					185	15f		0.00		6.769
+{{addstuff}} `added every load case from GUI
 /
 `----------Tank Conditions---------------
 `-----Departure Tanks-----

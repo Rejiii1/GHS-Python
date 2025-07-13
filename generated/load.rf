@@ -1,12 +1,12 @@
 Clear
 run ls.rf /call /quiet
 `===============================================================
-	set PAXCT	= 		`Max number of Passengers
+	set PAXCT	= 1		`Max number of Passengers
 	set PAXWT	= 185		`Avg Pax Weight
 `--------Locations-----------
-	set PAXLCG	= 		`LCG of Normal Pax loading
-	set PAXTCG	= 		`TCG of Noramal Pax
-	set PAXVCG	= 		`VCG of Normal Pax
+	set PAXLCG	= a		`LCG of Normal Pax loading
+	set PAXTCG	= s		`TCG of Noramal Pax
+	set PAXVCG	= d		`VCG of Normal Pax
 `===============================================================
 `----------SET UP TANK CONTENTS---------- `USUALLY DON'T NEED THIS SECTION UNLESS CONTESTING TANK CONTENTS IN SUBMISSION
 `SET TANK CONTENTS SP GRAVITY	`NEED TO COMMENT OUT TANKS THAT DON'T APPLY HERE
@@ -23,11 +23,10 @@ PERM (*) 0.98
 `===============================================================
 `----------Added Stuff (Every LC)------------
 MACRO ADDSTUFF
-`UNITS LT	
-`  add "Ballast Plate P" 	0.09	29.042f	2.50p	4.521	`both ballast are to port and conserve at VCG
-UNIT LB
-  add "CAPT (1)"					185 	13.250f	2.921s	6.769
-  add "CREW (1)"					185	15f		0.00		6.769
+UNITS LB
+ADD "asd" 2.3336 asd asd asd
+UNITS LT
+ADD "asd" 12 as s s `added every load case from GUI
 /
 `----------Tank Conditions---------------
 `-----Departure Tanks-----

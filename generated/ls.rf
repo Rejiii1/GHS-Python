@@ -1,6 +1,6 @@
 weight CLEAR
 echo OFF
-READ hulkl
+READ asd
 run macro.lib /call
 
 `----------SET VARIABLES----------
@@ -10,15 +10,15 @@ UNITS LT		`SETS THE UNIT FOR INPUT
 	set UNITREPORT 	= LT	`SETS THE UNITS FOR REPORT OUT
 	set TESTWTR		= 1.000				`MEASURED SPEC GRAV FOR WATER AT TEST - changed in excel paste
 	set SG 			= 1.025			`SPECIFIC GRAV FOR WATER FOR ANALYSIS (1.025 OR 1.00)
-	set OPTION		= 1		`1 DEADWEIGHT - 2 INCLINING - 3 USER LIGHTSHIP
+	set OPTION		= 2		`1 DEADWEIGHT - 2 INCLINING - 3 USER LIGHTSHIP
 	set VERT		= 1			`NEED FOR OPTION 1 - CONSERVATIVE VCG SET FOR DEADWEIGHT
-	set GMMT		= 1			`NEED FOR OPTION 2 - FROM MOMTAN TAB OF SPREADSHEET "a" (ft-LT) for INCLINING
+	set GMMT		= w			`NEED FOR OPTION 2 - FROM MOMTAN TAB OF SPREADSHEET "a" (ft-LT) for INCLINING
 `=========Draft Locations=========================================
-	set FWDDRLOC = 1		`QUERY MODEL TO FIND DRAFTS AT THESE 3 LOCATIONS
-	set MIDDRLOC = 2		
-	set AFTDRLOC = 3		
+	set FWDDRLOC = asd		`QUERY MODEL TO FIND DRAFTS AT THESE 3 LOCATIONS
+	set MIDDRLOC = asd		
+	set AFTDRLOC = asd		
 `=======OPTION 1 or 2 - Paste Excel for Survey Here===============
-1 `This is set by the GUI
+w `This is set by the GUI
 `=======OPTION 3 - For user lightship set here====================
 MACRO KNOWNLTSH	
 .ZERO
@@ -30,7 +30,13 @@ SOLVE
 `===============================================================
 `------------ADD/REMOVE THE INITIAL WEIGHTS FROM LTSH-----------
 MACRO INITIALWEIGHTS
- `Initial weights block set by GUI
+UNITS LB
+ADD "wt no d" -12 2 3 5
+ADD "wt d" -12.01 1 2 3
+ADD "super d" -12.000001 1 2 3
+ADD "remove no d" 15 1 2 3
+UNITS LT
+ADD "remove sup d" 15.0000001 1 2 3 `Initial weights block set by GUI
 /
 
 `-----------------------TANK CONDITIONS-------------------------
