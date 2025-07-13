@@ -2,13 +2,13 @@ CLEAR
 RUN load.rf /call
 `===============================================================
    set BEAM = 10			`BEAM IN FEET
-   set LENGTH = 30		`LBP IN FEET
+   set LENGTH = 5		`LBP IN FEET
 `=== Select Route ==============================================
    `set ROUTE = "PROTECT", "PARTIAL", "EXPOSED"
-   set ROUTE = PARTIAL `This is set by the GUI
+   set ROUTE = PROTECT `This is set by the GUI
 `=== Select Vessel Type ========================================
    `set VESSEL = POWER, PONTOON, RHIB, MONOSAIL, CATSAIL
-   set VESSEL = PONTOON ` This is set by the GUI
+   set VESSEL = POWER ` This is set by the GUI
 `=== Sail Area =================================================
 `ZERO IF MODEL INCLUDE FULL PROFILE AREA
    set AREA = 268					`PROFILE AREA IN SQUARE FEET
@@ -19,6 +19,9 @@ RUN load.rf /call
 `=== Downflooding Points =======================================
 MACRO CRITICAL
 CRIT (*) OFF
+CRIT (1) "eng room hatch" 12 13 14/flood/symmetrical
+CRIT (2) "pilot door" 22 23 24/flood/symmetrical
+CRIT (3) "thjrid poiints" 33 345 35/flood/symmetrical
 `crt (1) "companionway" 32.5 1.33 3.833/flood/symmetrical
 `crt (2) "head vent" 30 -3.917 4/flood/symmetrical
 CRIT (*) REPORT

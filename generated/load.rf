@@ -1,16 +1,16 @@
 Clear
 run ls.rf /call /quiet
 `===============================================================
-	set PAXCT	= a		`Max number of Passengers
+	set PAXCT	= 123		`Max number of Passengers
 	set PAXWT	= 185		`Avg Pax Weight
 `--------Locations-----------
-	set PAXLCG	= 1		`LCG of Normal Pax loading
+	set PAXLCG	= 12		`LCG of Normal Pax loading
 	set PAXTCG	= 2		`TCG of Noramal Pax
 	set PAXVCG	= 3		`VCG of Normal Pax
 `===============================================================
 `----------SET UP TANK CONTENTS---------- `USUALLY DON'T NEED THIS SECTION UNLESS CONTESTING TANK CONTENTS IN SUBMISSION
 `SET TANK CONTENTS SP GRAVITY	`NEED TO COMMENT OUT TANKS THAT DON'T APPLY HERE
-CONTENTS (FO.P) GASOLINE		`THE ASTERIX SETS ANY TANK THAT STARTS WITH FO TO 0.87
+`CONTENTS (FO*) GASOLINE		`THE ASTERIX SETS ANY TANK THAT STARTS WITH FO TO 0.87
 `CONTENTS (GAS*) .74
 `CONTENTS (FW*) 1.0		
 `CONTENTS (SEW*) 1.025
@@ -19,58 +19,35 @@ CONTENTS (FO.P) GASOLINE		`THE ASTERIX SETS ANY TANK THAT STARTS WITH FO TO 0.87
 `----------SET PERMEABILITY OF TANKS TO 0.98----------
 PERM (*) 0.98
 `----------Set names of FSM Tanks---------------------
- set FSMTanks = "(gas.c gas.s bw.c)"
+ set FSMTanks = "(fo.c bw.s)"
 `===============================================================
 `----------Added Stuff (Every LC)------------
 MACRO ADDSTUFF
+UNITS LB
+ADD "2" 2 2 2 2
 UNITS LT
-ADD "1" 1 1 1 1 `added every load case from GUI
+ADD "3" 4 5 6 7 `added every load case from GUI
 /
 `----------Tank Conditions---------------
-
 `-----Departure Tanks-----
 MACRO TANK1
 `LOAD (TANK) %
-LOAD (gas.c) 0.95
-LOAD (gas.s) 0.95
-LOAD (bw.c) 0.1
+LOAD (fo.c) 0.95
+LOAD (bw.s) 0.1
 /
 `-----Midway Tanks-----
 MACRO TANK2
 `LOAD (TANK) %
-LOAD (gas.c) 0.5
-LOAD (gas.s) 0.5
-LOAD (bw.c) 0.5
+LOAD (fo.c) 0.5
+LOAD (bw.s) 0.5
 /
 `-----Arrival Tanks-----
 MACRO TANK3
 `LOAD (TANK) %
-LOAD (gas.c) 0.1
-LOAD (gas.s) 0.1
-LOAD (bw.c) 0.95
+LOAD (fo.c) 0.1
+LOAD (bw.s) 0.95
 /
 
-
-`-----Departure Tanks-----
-MACRO TANK1
-`LOAD (TANK) %
-LOAD (FO.P) .95
-LOAD (FW*) .95
-LOAD (BW*) 0
-/
-`-----Midway Tanks-----
-MACRO TANK2
-`LOAD (TANK) %
-LOAD (FO.P) .5
-LOAD (FW*)  .5
-LOAD (BW*)  .5
-/
-`-----Arrival Tanks-----
-MACRO TANK3
-LOAD (FO.P) .1
-LOAD (FW*)  .1
-LOAD (BW*)  .95
-/
 `=== Extra Load Cases Here ========================================
 `----------LOAD CONDITION 5 (If Needed)----------
 `MACRO LC5

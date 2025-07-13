@@ -10,7 +10,7 @@ run ls.rf /call /quiet
 `===============================================================
 `----------SET UP TANK CONTENTS---------- `USUALLY DON'T NEED THIS SECTION UNLESS CONTESTING TANK CONTENTS IN SUBMISSION
 `SET TANK CONTENTS SP GRAVITY	`NEED TO COMMENT OUT TANKS THAT DON'T APPLY HERE
-CONTENTS (FO.P) GASOLINE		`THE ASTERIX SETS ANY TANK THAT STARTS WITH FO TO 0.87
+`CONTENTS (FO*) GASOLINE		`THE ASTERIX SETS ANY TANK THAT STARTS WITH FO TO 0.87
 `CONTENTS (GAS*) .74
 `CONTENTS (FW*) 1.0		
 `CONTENTS (SEW*) 1.025
@@ -26,29 +26,7 @@ MACRO ADDSTUFF
 {{addstuff}} `added every load case from GUI
 /
 `----------Tank Conditions---------------
-
 {{tank_macros}}
-
-`-----Departure Tanks-----
-MACRO TANK1
-`LOAD (TANK) %
-LOAD (FO.P) .95
-LOAD (FW*) .95
-LOAD (BW*) 0
-/
-`-----Midway Tanks-----
-MACRO TANK2
-`LOAD (TANK) %
-LOAD (FO.P) .5
-LOAD (FW*)  .5
-LOAD (BW*)  .5
-/
-`-----Arrival Tanks-----
-MACRO TANK3
-LOAD (FO.P) .1
-LOAD (FW*)  .1
-LOAD (BW*)  .95
-/
 `=== Extra Load Cases Here ========================================
 `----------LOAD CONDITION 5 (If Needed)----------
 `MACRO LC5

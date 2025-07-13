@@ -29,8 +29,12 @@ def generate_document():
     fwd_draft = fwd_draft_entry.get().strip()
     mid_draft = mid_draft_entry.get().strip()
     aft_draft = aft_draft_entry.get().strip()
+    beam = beam_entry.get().strip()
+    length = length_entry.get().strip()
+
     global initial_weights, add_weights
 
+    
 
     vessel_label = vessel_var.get().strip()
     vessel_value = vessel_label_to_value.get(vessel_label, "")
@@ -183,6 +187,19 @@ def generate_document():
             macro_block += f"LOAD ({name}) {pct}\n"
         macro_block += "/\n"
 
+    # === CRITICAL POINTS BLOCK ===
+    crit_block = ""
+    for er in critical_points:
+        num   = er["num_lbl"].cget("text")
+        name  = er["name_ent"].get().strip()
+        lon   = er["long_ent"].get().strip()
+        tra   = er["trans_ent"].get().strip()
+        ver   = er["vert_ent"].get().strip()
+        if not name or not lon or not tra or not ver:
+            continue
+        crit_block += f'CRIT ({num}) "{name}" {lon} {tra} {ver}/flood/symmetrical\n'
+
+
     # Define your templates and output filenames
     templates = {
         "ls_temp.txt": "ls.rf",
@@ -232,6 +249,9 @@ def generate_document():
             .replace("{{addstuff}}", addstuff_block.strip())
             .replace("{{fsm_tanks}}", fsm_tanks)
             .replace("{{tank_macros}}", macro_block)
+            .replace("{{beam}}", beam)
+            .replace("{{length}}", length)
+            .replace("{{critical_points}}", crit_block.strip())
         )
 
 
@@ -695,6 +715,26 @@ vessel_label_to_value = {
 tk.Label(tab_stab, text="Vessel Type:").pack(pady=(10, 0))
 ttk.Combobox(tab_stab, textvariable=vessel_var, values=list(vessel_label_to_value.keys()), state="readonly").pack()
 
+# === Vessel Dimensions ===
+tk.Label(tab_stab, text="Vessel Dimensions:", font=("Arial",10,"bold")).pack(pady=(20,5))
+
+dim_frame = tk.Frame(tab_stab)
+dim_frame.pack()
+
+# Beam
+tk.Label(dim_frame, text="Beam:").grid(row=0, column=0, padx=10)
+beam_entry = tk.Entry(dim_frame, width=12)
+beam_entry.insert(0, "{WOA}")
+beam_entry.grid(row=1, column=0, padx=10)
+
+# Length
+tk.Label(dim_frame, text="Length:").grid(row=0, column=1, padx=10)
+length_entry = tk.Entry(dim_frame, width=12)
+length_entry.insert(0, "{LOA}")
+length_entry.grid(row=1, column=1, padx=10)
+
+# Route
+
 route_var = tk.StringVar(value="Select a route")
 route_label_to_value = {
     "Protected Waters": "PROTECT",
@@ -703,6 +743,74 @@ route_label_to_value = {
 }
 tk.Label(tab_stab, text="Route:").pack(pady=(10, 0))
 ttk.Combobox(tab_stab, textvariable=route_var, values=list(route_label_to_value.keys()), state="readonly").pack()
+
+# === CRITICAL POINTS ===
+tk.Label(tab_stab, text="Critical Points:", font=("Arial",10,"bold")).pack(pady=(20,5))
+
+crit_frame = tk.Frame(tab_stab)
+crit_frame.pack()
+
+# Table header (hidden until first add)
+crit_header_created = False
+critical_points = []
+
+def reposition_crit_button():
+    idx = len(critical_points) + 1
+    crit_button.grid_forget()
+    crit_button.grid(row=idx, column=0, columnspan=5, pady=5)
+
+def add_crit_row():
+    global crit_header_created
+
+    if not crit_header_created:
+        headers = ["#", "Name", "Longitudinal", "Transverse", "Vertical", ""]
+        for c, h in enumerate(headers):
+            tk.Label(crit_frame, text=h, font=("Arial",10,"bold")).grid(row=0, column=c, padx=4)
+        crit_header_created = True
+
+    row = len(critical_points) + 1
+
+    # Widgets
+    num_lbl = tk.Label(crit_frame, text=str(row))
+    name_ent = tk.Entry(crit_frame, width=15)
+    long_ent = tk.Entry(crit_frame, width=10)
+    trans_ent= tk.Entry(crit_frame, width=10)
+    vert_ent = tk.Entry(crit_frame, width=10)
+
+    # Layout
+    num_lbl.grid(row=row, column=0, padx=2)
+    name_ent.grid(row=row, column=1, padx=2)
+    long_ent.grid(row=row, column=2, padx=2)
+    trans_ent.grid(row=row, column=3, padx=2)
+    vert_ent.grid(row=row, column=4, padx=2)
+
+    # Delete button
+    def delete_crit():
+        for w in (num_lbl, name_ent, long_ent, trans_ent, vert_ent, del_btn):
+            w.grid_forget()
+        critical_points.remove(entry_row)
+        # renumber remaining rows
+        for i, er in enumerate(critical_points, start=1):
+            er["num_lbl"].config(text=str(i))
+        reposition_crit_button()
+
+    del_btn = tk.Button(crit_frame, text="❌", command=delete_crit, fg="red")
+    del_btn.grid(row=row, column=5, padx=2)
+
+    entry_row = {
+        "num_lbl": num_lbl,
+        "name_ent": name_ent,
+        "long_ent": long_ent,
+        "trans_ent": trans_ent,
+        "vert_ent": vert_ent,
+        "del_btn": del_btn
+    }
+    critical_points.append(entry_row)
+    reposition_crit_button()
+
+crit_button = tk.Button(crit_frame, text="➕ Add Critical Point", command=add_crit_row)
+crit_button.grid(row=1, column=0, columnspan=5, pady=5)
+
 
 # === Bottom Button ===
 bottom_frame = tk.Frame(root)

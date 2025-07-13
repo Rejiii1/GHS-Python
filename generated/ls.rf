@@ -1,6 +1,6 @@
 weight CLEAR
 echo OFF
-READ as
+READ asd
 run macro.lib /call
 
 `----------SET VARIABLES----------
@@ -31,14 +31,14 @@ SOLVE
 `------------ADD/REMOVE THE INITIAL WEIGHTS FROM LTSH-----------
 MACRO INITIALWEIGHTS
 UNITS LB
-ADD "a" -a a a a `Initial weights block set by GUI
+ADD "1" -2 3 4 5 `Initial weights block set by GUI
 /
 
 `-----------------------TANK CONDITIONS-------------------------
 Macro INITIALTANKS
-TANK a
+TANK 1
 CONTENTS 0.74
-LOAD (a) a `Initial tanks block set by GUI
+LOAD (1) 2 `Initial tanks block set by GUI
 /
 `===============================================================
 .LTSHRPRT
