@@ -8,7 +8,7 @@ RUN load.rf /call
    set ROUTE = PARTIAL `This is set by the GUI
 `=== Select Vessel Type ========================================
    `set VESSEL = POWER, PONTOON, RHIB, MONOSAIL, CATSAIL
-   set VESSEL = POWER ` This is set by the GUI
+   set VESSEL = PONTOON ` This is set by the GUI
 `=== Sail Area =================================================
 `ZERO IF MODEL INCLUDE FULL PROFILE AREA
    set AREA = 268					`PROFILE AREA IN SQUARE FEET

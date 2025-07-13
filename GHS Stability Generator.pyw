@@ -8,6 +8,17 @@ def load_template():
     with open("ls_temp.txt", "r") as f:
         return f.read()
 
+# content‑to‑percent for each macro tank stage
+load_patterns = {
+    "Departure": {"default": "MACRO TANK1",
+                  "load": {"Gasoline":0.95, "Diesel":0.95, "Fresh Water":0.95, "Bait":0.95, "Sewage":0.10}},
+    "Midway":    {"default": "MACRO TANK2",
+                  "load": {"Gasoline":0.50, "Diesel":0.50, "Fresh Water":0.50, "Bait":0.50, "Sewage":0.50}},
+    "Arrival":   {"default": "MACRO TANK3",
+                  "load": {"Gasoline":0.10, "Diesel":0.10, "Fresh Water":0.10, "Bait":0.10, "Sewage":0.95}}
+}
+
+
 def generate_document():
     hull = name_entry.get().strip()
     sg_value = sg_label_to_value.get(sg_var.get(), "")
@@ -149,7 +160,28 @@ def generate_document():
             for item, weight, lcg, tcg, vcg in rows:
                 addstuff_block += f'ADD "{item}" {weight} {lcg} {tcg} {vcg}\n'
 
+# === FSM Tanks List ===
+    fsm_tanks_list = [
+        t["name_widget"].get().strip()
+        for t in load_tanks
+        if t["name_widget"].get().strip()
+    ]
+    fsm_tanks = " ".join(fsm_tanks_list)
 
+    # === Macro Tanks Sections ===
+    macro_block = ""
+    for stage in ["Departure", "Midway", "Arrival"]:
+        info = load_patterns[stage]
+        macro_block += f"`-----{stage} Tanks-----\n"
+        macro_block += f"{info['default']}\n"
+        macro_block += "`LOAD (TANK) %\n"
+        # pair up name widgets and contents
+        for t in load_tanks:
+            name = t["name_widget"].get().strip()
+            contents = t["contents_var"].get()
+            pct = info["load"][contents]
+            macro_block += f"LOAD ({name}) {pct}\n"
+        macro_block += "/\n"
 
     # Define your templates and output filenames
     templates = {
@@ -198,7 +230,8 @@ def generate_document():
             .replace("{{paxtcg}}", paxtcg)
             .replace("{{paxvcg}}", paxvcg)
             .replace("{{addstuff}}", addstuff_block.strip())
-
+            .replace("{{fsm_tanks}}", fsm_tanks)
+            .replace("{{tank_macros}}", macro_block)
         )
 
 
@@ -212,6 +245,7 @@ def generate_document():
 
 initial_weights = []
 add_weights = []
+fsm_tanks_list = []
 
 
 # GUI setup
@@ -430,31 +464,31 @@ contents_to_sg = {
 
 initial_tanks = []
 tank_header_created = False
-tanks_frame = tk.Frame(tab_lightship)
-tanks_frame.pack(pady=(20, 0))
+ltsh_tanks_frame = tk.Frame(tab_lightship)
+ltsh_tanks_frame.pack(pady=(20, 0))
 
-def reposition_tank_button():
+def reposition_ltsh_tank_button():
     row_idx = len(initial_tanks) + 1
-    tank_button.grid_forget()
-    tank_button.grid(row=row_idx, column=0, columnspan=4, pady=5)
+    ltsh_tank_button.grid_forget()
+    ltsh_tank_button.grid(row=row_idx, column=0, columnspan=4, pady=5)
 
-def add_tank_row():
+def ltsh_add_tank_row():
     global tank_header_created
 
     if not tank_header_created:
         header = ["Tank Name", "Contents", "Specific Gravity", "Load"]
         for col, label in enumerate(header):
-            tk.Label(tanks_frame, text=label, font=("Arial", 10, "bold")).grid(row=0, column=col, padx=4, pady=2)
+            tk.Label(ltsh_tanks_frame, text=label, font=("Arial", 10, "bold")).grid(row=0, column=col, padx=4, pady=2)
         tank_header_created = True
 
     row_idx = len(initial_tanks) + 1
 
-    name_entry = tk.Entry(tanks_frame, width=15)
+    name_entry = tk.Entry(ltsh_tanks_frame, width=15)
     contents_var = tk.StringVar()
-    contents_dropdown = ttk.Combobox(tanks_frame, textvariable=contents_var,
+    contents_dropdown = ttk.Combobox(ltsh_tanks_frame, textvariable=contents_var,
                                      values=list(contents_to_sg.keys()) + ["Other"], state="readonly", width=12)
-    sg_entry = tk.Entry(tanks_frame, width=10)
-    load_entry = tk.Entry(tanks_frame, width=10)
+    sg_entry = tk.Entry(ltsh_tanks_frame, width=10)
+    load_entry = tk.Entry(ltsh_tanks_frame, width=10)
 
     def on_contents_change(*args):
         selected = contents_var.get()
@@ -478,9 +512,9 @@ def add_tank_row():
         for widget in (name_entry, contents_dropdown, sg_entry, load_entry, delete_btn):
             widget.grid_forget()
         initial_tanks.remove(row_data)
-        reposition_tank_button()
+        reposition_ltsh_tank_button()
 
-    delete_btn = tk.Button(tanks_frame, text="❌", command=delete_tank_row, fg="red")
+    delete_btn = tk.Button(ltsh_tanks_frame, text="❌", command=delete_tank_row, fg="red")
     delete_btn.grid(row=row_idx, column=4, padx=2)
 
     row_data = {
@@ -492,11 +526,11 @@ def add_tank_row():
     }
 
     initial_tanks.append(row_data)
-    reposition_tank_button()
+    reposition_ltsh_tank_button()
 
 
-tank_button = tk.Button(tanks_frame, text="➕ Add Initial Tank", command=add_tank_row)
-tank_button.grid(row=1, column=0, columnspan=4, pady=5)
+ltsh_tank_button = tk.Button(ltsh_tanks_frame, text="➕ Add Initial Tank", command=ltsh_add_tank_row)
+ltsh_tank_button.grid(row=1, column=0, columnspan=4, pady=5)
 
 
 
@@ -594,7 +628,57 @@ def add_load_row():
 add_load_button = tk.Button(add_weights_frame, text="➕ Add Weight", command=add_load_row)
 add_load_button.grid(row=1, column=0, columnspan=6, pady=5)
 
+# === TANKS SECTION ===
+tk.Label(tab_loads, text="Tanks:", font=("Arial",10,"bold")).pack(pady=(20,5))
+load_tanks_frame = tk.Frame(tab_loads)
+load_tanks_frame.pack()
 
+load_tanks = []
+fsm_tanks_list = []
+
+def reposition_load_tank_button():
+    idx = len(load_tanks) + 1
+    load_tank_button.grid_forget()
+    load_tank_button.grid(row=idx, column=0, columnspan=2, pady=5)
+
+def load_add_tank_row():
+    if len(load_tanks) == 0:
+        tk.Label(load_tanks_frame, text="Name",    font=("Arial",10,"bold")).grid(row=0, column=0, padx=5)
+        tk.Label(load_tanks_frame, text="Contents",font=("Arial",10,"bold")).grid(row=0, column=1, padx=5)
+
+    row = len(load_tanks) + 1
+    name_ent = tk.Entry(load_tanks_frame, width=15)
+    contents_var = tk.StringVar(value="Gasoline")
+    contents_dd  = ttk.Combobox(
+        load_tanks_frame, textvariable=contents_var,
+        values=["Gasoline","Diesel","Fresh Water","Sewage","Bait"],
+        state="readonly", width=12
+    )
+
+    name_ent.grid(row=row, column=0, padx=5)
+    contents_dd.grid(row=row, column=1, padx=5)
+
+    def delete_tank():
+        name_ent.grid_forget()
+        contents_dd.grid_forget()
+        delete_btn.grid_forget()
+        # find and remove
+        for i, t in enumerate(load_tanks):
+            if t["name_widget"] is name_ent:
+                load_tanks.pop(i)
+                fsm_tanks_list.pop(i)
+                break
+        reposition_load_tank_button()
+
+    delete_btn = tk.Button(load_tanks_frame, text="❌", command=delete_tank, fg="red")
+    delete_btn.grid(row=row, column=2, padx=5)
+
+    load_tanks.append({"name_widget": name_ent, "contents_var": contents_var})
+    fsm_tanks_list.append(name_ent.get().strip() or f"TANK{row}")
+    reposition_load_tank_button()
+
+load_tank_button = tk.Button(load_tanks_frame, text="➕ Add Tank", command=load_add_tank_row)
+load_tank_button.grid(row=1, column=0, columnspan=2, pady=5)
 
 # === TAB 4: Intact Stability ===
 tab_stab = tk.Frame(notebook)

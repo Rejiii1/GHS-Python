@@ -19,13 +19,16 @@ CONTENTS (FO.P) GASOLINE		`THE ASTERIX SETS ANY TANK THAT STARTS WITH FO TO 0.87
 `----------SET PERMEABILITY OF TANKS TO 0.98----------
 PERM (*) 0.98
 `----------Set names of FSM Tanks---------------------
- set FSMTanks = "(FO* FW* BW*)"
+ set FSMTanks = "({{fsm_tanks}})"
 `===============================================================
 `----------Added Stuff (Every LC)------------
 MACRO ADDSTUFF
 {{addstuff}} `added every load case from GUI
 /
 `----------Tank Conditions---------------
+
+{{tank_macros}}
+
 `-----Departure Tanks-----
 MACRO TANK1
 `LOAD (TANK) %
