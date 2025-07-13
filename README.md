@@ -11,8 +11,8 @@ A simple Tkinter-based GUI to help marine engineers and naval architects quickly
 ## 🚀 Features
 
 - **Tabbed Interface** organized by task:
-  - 📄 **Report Details** – Set geometry file name.
-  - ⚖️ **Lightship** – Select survey type, paste Excel data, define user lightship, and manage initial weights.
+  - 📄 **Report Details** – Set geometry file name and other report info.
+  - ⚖️ **Lightship** – Select survey type, paste Excel data, define user lightship, and manage initial weights and tanks.
   - ⚙️ **Loads** – *(Coming soon!)*
   - 🧭 **Intact Stability** – Set vessel type and route.
 
@@ -24,6 +24,9 @@ A simple Tkinter-based GUI to help marine engineers and naval architects quickly
 - **Initial Weights Table**:
   - Add/remove rows with item name, weight, units, and center of gravity data.
   - Auto-grouped by units (`LB` or `LT`) during output.
+ 
+- **Initial Tanks**:
+  - Add/remove rows with tank name, contents, and load.
 
 - **Template-Based Output**:
   - Reads from `.txt` templates (`ls_temp.txt`, `load_temp.txt`, etc.)
