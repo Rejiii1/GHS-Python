@@ -1,4 +1,4 @@
-weight CLEAR
+CLEAR
 echo OFF
 READ {{hull}}
 run macro.lib /call
@@ -40,5 +40,3 @@ Macro INITIALTANKS
 `===============================================================
 .LTSHRPRT
 
-
-test {{tcg122}}
