@@ -36,9 +36,7 @@ Organized into task-specific tabs:
 
 ---
 
-## 📸 Preview
-
-> _(Insert a screenshot of the GUI here for max GitHub cred!)_
+## Next up Damage Stability
 
 ---
 
