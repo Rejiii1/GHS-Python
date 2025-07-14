@@ -1,3 +1,9 @@
+#   GHS Stability Generator
+#   A tool to generate GHS run files for stability analysis
+#   Version: 1.0.1
+#   Updated: 07-14-2025
+#   Created by: Trip Jackson
+
 import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import datetime
