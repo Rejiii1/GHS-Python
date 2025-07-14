@@ -1,6 +1,6 @@
 weight CLEAR
 echo OFF
-READ 123
+READ hull.gf full schebang
 run macro.lib /call
 
 `----------SET VARIABLES----------
@@ -10,32 +10,44 @@ UNITS LT		`SETS THE UNIT FOR INPUT
 	set UNITREPORT 	= LT	`SETS THE UNITS FOR REPORT OUT
 	set TESTWTR		= 1.000				`MEASURED SPEC GRAV FOR WATER AT TEST - changed in excel paste
 	set SG 			= 1.025			`SPECIFIC GRAV FOR WATER FOR ANALYSIS (1.025 OR 1.00)
-	set OPTION		= 2		`1 DEADWEIGHT - 2 INCLINING - 3 USER LIGHTSHIP
+	set OPTION		= 3		`1 DEADWEIGHT - 2 INCLINING - 3 USER LIGHTSHIP
 	set VERT		= 1			`NEED FOR OPTION 1 - CONSERVATIVE VCG SET FOR DEADWEIGHT
-	set GMMT		= 2			`NEED FOR OPTION 2 - FROM MOMTAN TAB OF SPREADSHEET "a" (ft-LT) for INCLINING
+	set GMMT		= 1			`NEED FOR OPTION 2 - FROM MOMTAN TAB OF SPREADSHEET "a" (ft-LT) for INCLINING
 `=========Draft Locations=========================================
-	set FWDDRLOC = 1		`QUERY MODEL TO FIND DRAFTS AT THESE 3 LOCATIONS
-	set MIDDRLOC = 2		
-	set AFTDRLOC = 3		
+	set FWDDRLOC = 12f		`QUERY MODEL TO FIND DRAFTS AT THESE 3 LOCATIONS
+	set MIDDRLOC = 0.0		
+	set AFTDRLOC = 12.5a		
 `=======OPTION 1 or 2 - Paste Excel for Survey Here===============
-1 `This is set by the GUI
+ `This is set by the GUI
 `=======OPTION 3 - For user lightship set here====================
 MACRO KNOWNLTSH	
 .ZERO
-
-   	`Known lightship weight, LCG, TCG, VCG set by GUI
+UNITS LT
+WEIGHT 1000 30a 0.01p 5.83	`Known lightship weight, LCG, TCG, VCG set by GUI
 UNITS {UNITREPORT}
 SOLVE
 /
 `===============================================================
 `------------ADD/REMOVE THE INITIAL WEIGHTS FROM LTSH-----------
 MACRO INITIALWEIGHTS
- `Initial weights block set by GUI
+UNITS LB
+ADD "pendulum" -50 15 0.2s 2
+UNITS LT
+ADD "asd" 12 2 3 4 `Initial weights block set by GUI
 /
 
 `-----------------------TANK CONDITIONS-------------------------
 Macro INITIALTANKS
- `Initial tanks block set by GUI
+TANK gass
+CONTENTS 0.74
+LOAD (gass) 1
+
+TANK bw
+CONTENTS 1.025
+LOAD (bw) .5 `Initial tanks block set by GUI
 /
 `===============================================================
 .LTSHRPRT
+
+
+test {{tcg122}}

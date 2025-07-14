@@ -32,6 +32,12 @@ def generate_document():
     beam = beam_entry.get().strip()
     length = length_entry.get().strip()
 
+    if not tank_model_var.get():
+        notanksfs = fs_entry.get().strip()
+    else:
+        notanksfs = "0"
+
+
     if not profile_var.get():
         wind_area = wind_area_entry.get().strip()
         wind_arm  = wind_arm_entry.get().strip()
@@ -206,13 +212,42 @@ def generate_document():
             continue
         crit_block += f'CRIT ({num}) "{name}" {lon} {tra} {ver}/flood/symmetrical\n'
 
+    # --- PONTOON-SPECIFIC DATA EXTRACTION (DO THIS ONCE, BEFORE THE TEMPLATE LOOP) ---
+    pontoon_replacements = {}
+    head_lcg_val = ""
+    head_tcg_val = ""
+
+    if pontoon_tab: # Check if pontoon_tab exists
+        for table in (pontoon_tab.crowd2, pontoon_tab.crowd5):
+            for row in table:
+                code     = row["code"]                    # e.g. "105"
+                lcg_val  = row["lcg"].get().strip()
+                tcg_val  = row["tcg"].get().strip()
+                head_val = "1" if row["head"].get() else "0"
+
+                pontoon_replacements[f"{{{{lcg{code}}}}}"] = lcg_val
+                pontoon_replacements[f"{{{{tcg{code}}}}}"] = tcg_val
+                pontoon_replacements[f"{{{{head{code}}}}}"] = head_val
+        
+        # Retrieve head LCG and TCG only if the pontoon tab exists and entries are populated
+        if hasattr(pontoon_tab, 'headlcg_entry') and pontoon_tab.headlcg_entry.get().strip():
+            head_lcg_val = pontoon_tab.headlcg_entry.get().strip()
+        if hasattr(pontoon_tab, 'headtcg_entry') and pontoon_tab.headtcg_entry.get().strip():
+            head_tcg_val = pontoon_tab.headtcg_entry.get().strip()
+    
+    # Add head LCG/TCG to replacements
+    pontoon_replacements["{{headlcg}}"] = head_lcg_val
+    pontoon_replacements["{{headtcg}}"] = head_tcg_val
+
+
 
     # Define your templates and output filenames
     templates = {
         "ls_temp.txt": "ls.rf",
         "load_temp.txt": "load.rf",
         "int_temp.txt": "int.rf",
-        "dam_temp.txt": "dam.rf"
+        "dam_temp.txt": "dam.rf",
+        "pontoon_temp.txt": "pontoon.lib"
     }
 
     for template_file, output_file in templates.items():
@@ -261,9 +296,13 @@ def generate_document():
             .replace("{{critical_points}}", crit_block.strip())
             .replace("{{wind_area}}", wind_area)
             .replace("{{wind_arm}}",  wind_arm)
+            .replace("{{notanksfs}}", notanksfs)
         )
 
-
+       # Apply pontoon-specific replacements IF this is the pontoon template
+        if template_file == "pontoon_temp.txt":
+            for placeholder, value in pontoon_replacements.items():
+                filled_text = filled_text.replace(placeholder, value)
 
         output_path = os.path.join(output_dir, output_file)
         with open(output_path, "w") as f:
@@ -659,9 +698,6 @@ add_load_button.grid(row=1, column=0, columnspan=6, pady=5)
 
 # === TANKS SECTION ===
 tk.Label(tab_loads, text="Tanks:", font=("Arial",10,"bold")).pack(pady=(20,5))
-
-
-
 load_tanks_frame = tk.Frame(tab_loads)
 load_tanks_frame.pack()
 
@@ -712,6 +748,37 @@ def load_add_tank_row():
 load_tank_button = tk.Button(load_tanks_frame, text="➕ Add Tank", command=load_add_tank_row)
 load_tank_button.grid(row=1, column=0, columnspan=2, pady=5)
 
+# === TANK MODEL TOGGLE ===
+# BooleanVar default True (checked)
+tank_model_var = tk.BooleanVar(value=True)
+
+def toggle_tank_model_field():
+    """Show the Free Surface Moment field only when unchecked."""
+    if not tank_model_var.get():
+        tank_model_frame.pack(pady=(5, 0))
+    else:
+        tank_model_frame.pack_forget()   # <-- use pack_forget()
+
+# Checkbutton itself
+tank_chk = tk.Checkbutton(
+    tab_loads,
+    text="Vessel has tank model",
+    variable=tank_model_var,
+    command=toggle_tank_model_field
+)
+tank_chk.pack(pady=(20, 5))
+
+# Frame for the Free Surface Moment input (hidden by default)
+tank_model_frame = tk.Frame(tab_loads)
+
+tk.Label(tank_model_frame, text="Free Surface Moment:").grid(row=0, column=0, padx=10)
+fs_entry = tk.Entry(tank_model_frame, width=12)
+fs_entry.grid(row=1, column=0, padx=10)
+
+# Initialize visibility correctly
+toggle_tank_model_field()
+
+
 # === TAB 4: Intact Stability ===
 tab_stab = tk.Frame(notebook)
 notebook.add(tab_stab, text="Intact Stability")
@@ -725,7 +792,110 @@ vessel_label_to_value = {
     "Catamaran Sailboat": "CATSAIL"
 }
 tk.Label(tab_stab, text="Vessel Type:").pack(pady=(10, 0))
-ttk.Combobox(tab_stab, textvariable=vessel_var, values=list(vessel_label_to_value.keys()), state="readonly").pack()
+vessel_dropdown = ttk.Combobox(
+    tab_stab,
+    textvariable=vessel_var,
+    values=list(vessel_label_to_value.keys()),
+    state="readonly"
+)
+vessel_dropdown.pack()
+
+
+def build_pontoon_content(tab):
+    # 1) Passenger Crowding title
+    tk.Label(tab, text="Passenger Crowding", font=("Arial", 12, "bold")) \
+      .pack(pady=(10,5))
+
+    load_cases = [
+        ("Bow",         (0,1)),
+        ("Port Bow",    (1,1)),
+        ("Port",        (1,0)),
+        ("Port Quarter",(1,2)),
+        ("Stern",       (0,2)),
+        ("Stbd Quarter",(2,2)),
+        ("Stbd",        (2,0)),
+        ("Stbd Bow",    (2,1)),
+    ]
+
+    def make_crowd_table(rows_per_passenger):
+        crowd_frame = tk.Frame(tab)
+        crowd_frame.pack(pady=5)
+        title = f"{rows_per_passenger} sqft per Passenger"
+        tk.Label(crowd_frame, text=title, font=("Arial",10,"italic")) \
+          .grid(row=0, column=0, columnspan=4)
+
+        headers = ["Crowding","LCG","TCG","Pax in Head"]
+        for c, h in enumerate(headers):
+            tk.Label(crowd_frame, text=h, font=("Arial",9,"bold")) \
+              .grid(row=1, column=c, padx=5)
+
+        entries = []
+        for r, (name, (h_code, v_code)) in enumerate(load_cases, start=2):
+            tk.Label(crowd_frame, text=name) \
+              .grid(row=r, column=0, padx=5)
+            e_lcg = tk.Entry(crowd_frame, width=8);  e_lcg.grid(row=r, column=1)
+            e_tcg = tk.Entry(crowd_frame, width=8);  e_tcg.grid(row=r, column=2)
+            b_head = tk.BooleanVar(value=False)
+            tk.Checkbutton(crowd_frame, variable=b_head) \
+              .grid(row=r, column=3)
+
+            code = f"{h_code}{v_code}{2 if rows_per_passenger==2 else 5}"
+            entries.append({
+                "code": code,
+                "lcg":  e_lcg,
+                "tcg":  e_tcg,
+                "head": b_head
+            })
+        return entries
+
+    # build both tables
+    tab.crowd2 = make_crowd_table(2)
+    tab.crowd5 = make_crowd_table(5)
+
+    # 3) Head Location
+    tk.Label(tab, text="Head Location", font=("Arial", 12, "bold")) \
+      .pack(pady=(15,5))
+    hl_frame = tk.Frame(tab); hl_frame.pack(pady=5)
+    tk.Label(hl_frame, text="LCG").grid(row=0, column=0, padx=10)
+    tk.Label(hl_frame, text="TCG").grid(row=0, column=1, padx=10)
+    tab.headlcg_entry = tk.Entry(hl_frame, width=10)
+    tab.headlcg_entry.grid(row=1, column=0, padx=10)
+    tab.headtcg_entry = tk.Entry(hl_frame, width=10)
+    tab.headtcg_entry.grid(row=1, column=1, padx=10)
+
+
+
+# placeholder for our dynamic tab
+pontoon_tab = None
+
+def update_pontoon_tab(*args):
+    global pontoon_tab
+    if vessel_var.get() == "Pontoon Boat" and pontoon_tab is None:
+        pontoon_tab = tk.Frame(notebook)
+        notebook.add(pontoon_tab, text="Pontoon")
+        # build the full pontoon UI here
+        build_pontoon_content(pontoon_tab)
+
+    elif vessel_var.get() != "Pontoon Boat" and pontoon_tab is not None:
+        notebook.forget(pontoon_tab)
+        pontoon_tab = None
+
+def update_pontoon_tab(*args):
+    global pontoon_tab
+    if vessel_var.get() == "Pontoon Boat" and pontoon_tab is None:
+        pontoon_tab = tk.Frame(notebook)
+        notebook.add(pontoon_tab, text="Pontoon")
+        # build the full pontoon UI here
+        build_pontoon_content(pontoon_tab)
+
+    elif vessel_var.get() != "Pontoon Boat" and pontoon_tab is not None:
+        notebook.forget(pontoon_tab)
+        pontoon_tab = None
+
+# Hook the trace *after* creating the combobox
+vessel_var.trace_add("write", update_pontoon_tab)
+# Call once in case default is already "Pontoon Boat"
+update_pontoon_tab()
 
 # === Vessel Dimensions ===
 tk.Label(tab_stab, text="Vessel Dimensions:", font=("Arial",10,"bold")).pack(pady=(20,5))
@@ -859,6 +1029,7 @@ def toggle_profile_fields():
 
 # Ensure correct initial state
 toggle_profile_fields()
+
 
 
 # === Bottom Button ===

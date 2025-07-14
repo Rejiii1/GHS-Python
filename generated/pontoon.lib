@@ -1,0 +1,126 @@
+`--------Pontoon Variables--------
+ vari(real)	LCG105 TCG105 LCG205 TCG205 LCG015 TCG015 LCG025 TCG025 LCG115 TCG115 LCG215 TCG215 LCG125 TCG125 LCG225 TCG225 LCG102 TCG102 LCG202 TCG202 LCG012 TCG012 LCG022 TCG022 LCG112 TCG112 LCG212 TCG212 LCG122 TCG122 LCG222 TCG222 /color:3
+ `Head Locations
+ vari(real)	HEADLCG HEADTCG HEADNUM HEADWT HMAXPAX HMAXPW /color:4
+`Head Applicability Variables
+ vari(real)	HEAD105 HEAD205 HEAD015 HEAD025 HEAD115 HEAD215 HEAD125 HEAD225 HEAD102 HEAD202 HEAD012 HEAD022 HEAD112 HEAD212 HEAD122 HEAD222 /color:5
+`Changing Variables
+ vari(real)	PAXSQFT PORTSTBD FWDAFT DMA TPORTSTBD TFWDAFT TDMA
+`=======================================================================
+`---------------PONTOON STUFF------------------
+	`-----Pax Crowding-----
+`CENTER = 0
+`PORT   = 1
+`STBD   = 2
+`CENTER = 0
+`FWD    = 1
+`AFT    = 2
+
+`LCG(Port/Stbd)(Fwd/Aft)(2/5)
+set LCG105   =	56	`Port 5sqft LCG(ft)
+set TCG105   =	5	`           TCG(ft)
+set LCG205   =	65	`Stbd 5sqft LCG(ft)
+set TCG205   =	65411	`           TCG(ft)
+set LCG015   =	51	`Fwd 5sqft  LCG(ft)
+set TCG015   =	52 	`	    	   TCG(ft)
+set LCG025   =	56	`Aft 5sqft  LCG(ft)
+set TCG025   =	56	`	    	   TCG(ft)
+						
+set LCG115  =	5	`Fwd Port 5sqft LCG
+set TCG115  =	5	`			  TCG
+set LCG215  =	121	`Fwd Stbd 5sqft LCG
+set TCG215  =	21	`			  TCG
+set LCG125  =	5	`Aft Port 5sqft LCG
+set TCG125  =	65	`	        	  TCG
+set LCG225  =	56	`Aft Stbd 5sqft LCG
+set TCG225  =	56	`		      TCG
+						
+set LCG102	=	pl	`Port 2sqft LCG(ft) 
+set TCG102	=	pt	`           TCG(ft) 
+set LCG202	=	sl	`Stbd 2sqft LCG(ft)
+set LCG012  =	bowlcg	`Fwd 2sqft  LCG(ft)
+set TCG012  =	bowt	`	       TCG(ft)
+set LCG022  =	sl	`Aft 2sqft  LCG(ft)
+set TCG022  =	st	`	    	   TCG(ft)
+						 
+set LCG112  =	pbowl	`Fwd Port 2sqft LCG
+set TCG112  =	pbt	`	           TCG
+set LCG212  =	sbl	`Fwd Stbd 2sqft LCG
+set TCG212  =	sbt	`			   TCG
+set LCG122  =	pql	`Aft Port 2sqft LCG
+set TCG122  =	pqtr	`	           TCG
+set LCG222  =	sql	`Aft Stbd 2sqft LCG
+set TCG222  =	sqt	`		       TCG
+	`-----HEAD LOCATION-----
+set HEADLCG =	head lcg		`Head LCG
+set HEADTCG =	headtcg		`Head TCG
+set HEADNUM = 1		`Pax in head
+SET HEADWT = {HEADNUM} times {PAXWT}
+SET HMAXPAX  = {PAXCT} minus {HEADNUM}
+SET HMAXPW = {HMAXPAX} times {PAXWT}
+	`-----Head Applicability
+`HEAD{PORTSTBD}{FWDAFT}{PAXSQFT} Set to 0 for not applicable or 1 for applicable
+set HEAD105  = 0		`Port Mid 5
+set HEAD205  = 0		`Stbd Mid 5
+set HEAD015  = 1		`Cent Fwd 5
+set HEAD025  = 1		`Cent Aft 5
+set HEAD115  = 0		`Port Fwd 5
+set HEAD215  = 0		`Stbd Fwd 5
+set HEAD125  = 0		`Port Aft 5
+set HEAD225  = 0		`Stbd Aft 5
+
+set HEAD102  = 1		`Port Mid 2
+set HEAD202  = 0		`Stbd Mid 2
+set HEAD012  = 0		`Cent Fwd 2
+set HEAD022  = 0	`Cent Aft 2
+set HEAD112  = 1	`Port Fwd 2
+set HEAD212  = 0	`Stbd Fwd 2
+set HEAD122  = 1	`Port Aft 2
+set HEAD222  = 0	`Stbd Aft 2
+
+`---------Cycle of pontoon loads
+MACRO TANKCONDIT	`Cycles through the three tank loads
+SET DMA = 1
+.TOONTEST
+SET DMA = 2
+.TOONTEST
+SET DMA = 3
+.TOONTEST
+/
+
+MACRO PSCYCLE		`Cycles through the port and stbd loading
+SET FWDAFT = 0
+SET PORTSTBD = 1
+.TANKCONDIT
+SET PORTSTBD = 2
+.TANKCONDIT
+/
+
+MACRO FACYCLE		`Cycles through fwd aft loading
+SET PORTSTBD = 0
+SET FWDAFT = 1
+.TANKCONDIT
+SET FWDAFT = 2
+.TANKCONDIT
+/
+
+MACRO CORNERS 		`Cycles through corner loading
+SET PORTSTBD = 1
+SET FWDAFT = 1
+.TANKCONDIT
+SET PORTSTBD = 2
+SET FWDAFT = 1
+.TANKCONDIT
+SET PORTSTBD = 1
+SET FWDAFT = 2
+.TANKCONDIT
+SET PORTSTBD = 2
+SET FWDAFT = 2
+.TANKCONDIT
+/
+
+MACRO FULLTEST 		`Does port/stbd, fwd/aft, port/stbd bow, and port/stbd qtr
+.PSCYCLE
+.FACYCLE
+.CORNERS
+/
