@@ -258,7 +258,8 @@ def generate_document():
         "load_temp.txt": "load.rf",
         "int_temp.txt": "int.rf",
         "dam_temp.txt": "dam.rf",
-        "pontoon_temp.txt": "pontoon.lib"
+        "pontoon_temp.txt": "pontoon.lib",
+        "macro_temp.txt": "macro.lib"
     }
 
     for template_file, output_file in templates.items():
