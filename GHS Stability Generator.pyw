@@ -89,7 +89,12 @@ def generate_document():
     unit_value = f"UNITS {unit_var.get()}" if survey_label == "User Defined Lightship" else ""
 
 
-    output_dir = os.path.join(os.getcwd(), "generated")
+    custom_path = file_location_entry.get().strip()
+    if custom_path:
+        output_dir = custom_path
+    else:
+        output_dir = os.path.join(os.getcwd(), "generated")
+
     os.makedirs(output_dir, exist_ok=True)
 
 # Prepare the initial weights block
@@ -328,6 +333,12 @@ notebook.pack(fill="both", expand=True)
 # === TAB 1: Report Details ===
 tab_report = tk.Frame(notebook)
 notebook.add(tab_report, text="Report Details")
+
+# File Location (optional)
+file_location_label = tk.Label(tab_report, text="File Location (optional):")
+file_location_label.pack(pady=(10, 0))
+file_location_entry = tk.Entry(tab_report, width=50)
+file_location_entry.pack(pady=(0, 10))
 
 # Geometry File Name
 tk.Label(tab_report, text="Geometry File Name:").pack(pady=(10, 0))

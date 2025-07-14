@@ -1,26 +1,25 @@
 CLEAR
 RUN load.rf /call
 `===============================================================
-   set BEAM = 12			`BEAM IN FEET
-   set LENGTH = 555		`LBP IN FEET
+   set BEAM = {WOA}			`BEAM IN FEET
+   set LENGTH = {LOA}		`LBP IN FEET
 `=== Select Route ==============================================
    `set ROUTE = "PROTECT", "PARTIAL", "EXPOSED"
    set ROUTE = PARTIAL `This is set by the GUI
 `=== Select Vessel Type ========================================
    `set VESSEL = POWER, PONTOON, RHIB, MONOSAIL, CATSAIL
-   set VESSEL = PONTOON ` This is set by the GUI
+   set VESSEL = RHIB ` This is set by the GUI
 `=== Sail Area =================================================
 `ZERO IF MODEL INCLUDE FULL PROFILE AREA
-   set AREA = 500					         `PROFILE AREA IN SQUARE FEET
-   set ARM_ABOVE_TO_BELOW_WL = 5.5	`DISTANCE FROM UNDERWATER CENTROID TO ABOVE WATER CENTROID
+   set AREA = 0					         `PROFILE AREA IN SQUARE FEET
+   set ARM_ABOVE_TO_BELOW_WL = 0	`DISTANCE FROM UNDERWATER CENTROID TO ABOVE WATER CENTROID
 `=== Rank Geometry =============================================
 `If no tanks exist in model change that 0 to the FSM from submission
    set NOTANKSFS = 0
 `=== Downflooding Points =======================================
 MACRO CRITICAL
 CRIT (*) OFF
-CRIT (1) "eng room" 152 12 3/flood/symmetrical
-CRIT (2) "123" 3 33 33/flood/symmetrical  `Downflooding points set by GUI
+  `Downflooding points set by GUI
 CRIT (*) REPORT
 /
 `===============================================================

@@ -1,12 +1,12 @@
 Clear
 run ls.rf /call /quiet
 `===============================================================
-	set PAXCT	= 18		`Max number of Passengers
-	set PAXWT	= 199		`Avg Pax Weight
+	set PAXCT	= 		`Max number of Passengers
+	set PAXWT	= 185		`Avg Pax Weight
 `--------Locations-----------
-	set PAXLCG	= 2.0a		`LCG of Normal Pax loading
-	set PAXTCG	= 0.02p		`TCG of Noramal Pax
-	set PAXVCG	= 5.6		`VCG of Normal Pax
+	set PAXLCG	= 		`LCG of Normal Pax loading
+	set PAXTCG	= 		`TCG of Noramal Pax
+	set PAXVCG	= 		`VCG of Normal Pax
 `===============================================================
 `----------SET UP TANK CONTENTS---------- `USUALLY DON'T NEED THIS SECTION UNLESS CONTESTING TANK CONTENTS IN SUBMISSION
 `SET TANK CONTENTS SP GRAVITY	`NEED TO COMMENT OUT TANKS THAT DON'T APPLY HERE
@@ -19,33 +19,24 @@ run ls.rf /call /quiet
 `----------SET PERMEABILITY OF TANKS TO 0.98----------
 PERM (*) 0.98
 `----------Set names of FSM Tanks---------------------
- set FSMTanks = "(fo.c bw*)"
+ set FSMTanks = "()"
 `===============================================================
 `----------Added Stuff (Every LC)------------
 MACRO ADDSTUFF
-UNITS LB
-ADD "crew" 185 12.3 2. 2851
-UNITS LT
-ADD "asd" 12 3 4 5 `added every load case from GUI
+ `added every load case from GUI
 /
 `----------Tank Conditions---------------
 `-----Departure Tanks-----
 MACRO TANK1
 `LOAD (TANK) %
-LOAD (fo.c) 0.95
-LOAD (bw*) 0.1
 /
 `-----Midway Tanks-----
 MACRO TANK2
 `LOAD (TANK) %
-LOAD (fo.c) 0.5
-LOAD (bw*) 0.5
 /
 `-----Arrival Tanks-----
 MACRO TANK3
 `LOAD (TANK) %
-LOAD (fo.c) 0.1
-LOAD (bw*) 0.95
 /
 
 `=== Extra Load Cases Here ========================================
