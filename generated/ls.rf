@@ -1,6 +1,6 @@
 weight CLEAR
 echo OFF
-READ asd
+READ 123
 run macro.lib /call
 
 `----------SET VARIABLES----------
@@ -10,35 +10,32 @@ UNITS LT		`SETS THE UNIT FOR INPUT
 	set UNITREPORT 	= LT	`SETS THE UNITS FOR REPORT OUT
 	set TESTWTR		= 1.000				`MEASURED SPEC GRAV FOR WATER AT TEST - changed in excel paste
 	set SG 			= 1.025			`SPECIFIC GRAV FOR WATER FOR ANALYSIS (1.025 OR 1.00)
-	set OPTION		= 3		`1 DEADWEIGHT - 2 INCLINING - 3 USER LIGHTSHIP
+	set OPTION		= 2		`1 DEADWEIGHT - 2 INCLINING - 3 USER LIGHTSHIP
 	set VERT		= 1			`NEED FOR OPTION 1 - CONSERVATIVE VCG SET FOR DEADWEIGHT
-	set GMMT		= 1			`NEED FOR OPTION 2 - FROM MOMTAN TAB OF SPREADSHEET "a" (ft-LT) for INCLINING
+	set GMMT		= 2			`NEED FOR OPTION 2 - FROM MOMTAN TAB OF SPREADSHEET "a" (ft-LT) for INCLINING
 `=========Draft Locations=========================================
-	set FWDDRLOC = a		`QUERY MODEL TO FIND DRAFTS AT THESE 3 LOCATIONS
-	set MIDDRLOC = s		
-	set AFTDRLOC = d		
+	set FWDDRLOC = 1		`QUERY MODEL TO FIND DRAFTS AT THESE 3 LOCATIONS
+	set MIDDRLOC = 2		
+	set AFTDRLOC = 3		
 `=======OPTION 1 or 2 - Paste Excel for Survey Here===============
- `This is set by the GUI
+1 `This is set by the GUI
 `=======OPTION 3 - For user lightship set here====================
 MACRO KNOWNLTSH	
 .ZERO
-UNITS LB
-WEIGHT a s d f	`Known lightship weight, LCG, TCG, VCG set by GUI
+
+   	`Known lightship weight, LCG, TCG, VCG set by GUI
 UNITS {UNITREPORT}
 SOLVE
 /
 `===============================================================
 `------------ADD/REMOVE THE INITIAL WEIGHTS FROM LTSH-----------
 MACRO INITIALWEIGHTS
-UNITS LB
-ADD "1" -2 3 4 5 `Initial weights block set by GUI
+ `Initial weights block set by GUI
 /
 
 `-----------------------TANK CONDITIONS-------------------------
 Macro INITIALTANKS
-TANK 1
-CONTENTS 0.74
-LOAD (1) 2 `Initial tanks block set by GUI
+ `Initial tanks block set by GUI
 /
 `===============================================================
 .LTSHRPRT

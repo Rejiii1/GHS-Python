@@ -32,6 +32,13 @@ def generate_document():
     beam = beam_entry.get().strip()
     length = length_entry.get().strip()
 
+    if not profile_var.get():
+        wind_area = wind_area_entry.get().strip()
+        wind_arm  = wind_arm_entry.get().strip()
+    else:
+        wind_area = "0"
+        wind_arm  = "0"
+
     global initial_weights, add_weights
 
     
@@ -252,6 +259,8 @@ def generate_document():
             .replace("{{beam}}", beam)
             .replace("{{length}}", length)
             .replace("{{critical_points}}", crit_block.strip())
+            .replace("{{wind_area}}", wind_area)
+            .replace("{{wind_arm}}",  wind_arm)
         )
 
 
@@ -650,6 +659,9 @@ add_load_button.grid(row=1, column=0, columnspan=6, pady=5)
 
 # === TANKS SECTION ===
 tk.Label(tab_loads, text="Tanks:", font=("Arial",10,"bold")).pack(pady=(20,5))
+
+
+
 load_tanks_frame = tk.Frame(tab_loads)
 load_tanks_frame.pack()
 
@@ -810,6 +822,43 @@ def add_crit_row():
 
 crit_button = tk.Button(crit_frame, text="➕ Add Critical Point", command=add_crit_row)
 crit_button.grid(row=1, column=0, columnspan=5, pady=5)
+
+# === PROFILE AREA TOGGLE ===
+# BooleanVar default True (checked)
+tk.Label(tab_stab, text="Wind Profile:", font=("Arial",10,"bold")).pack(pady=(20,0))
+profile_var = tk.BooleanVar(value=True)
+
+# Checkbutton
+chk = tk.Checkbutton(
+    tab_stab,
+    text="Model includes Profile Area:",
+    variable=profile_var,
+    command=lambda: toggle_profile_fields()
+)
+chk.pack(pady=(5, 5))
+
+# Frame to hold the two additional fields (hidden by default)
+profile_frame = tk.Frame(tab_stab)
+
+# Wind Area
+tk.Label(profile_frame, text="Wind Area:").grid(row=0, column=0, padx=10)
+wind_area_entry = tk.Entry(profile_frame, width=12)
+wind_area_entry.grid(row=1, column=0, padx=10)
+
+# Distance between Above/Below WL Centroids
+tk.Label(profile_frame, text="Distance between Above to Below WL Centroids:").grid(row=0, column=1, padx=10)
+wind_arm_entry = tk.Entry(profile_frame, width=12)
+wind_arm_entry.grid(row=1, column=1, padx=10)
+
+def toggle_profile_fields():
+    """Show the two fields only when checkbox is UN‐checked."""
+    if not profile_var.get():
+        profile_frame.pack(pady=(10,0))
+    else:
+        profile_frame.forget()
+
+# Ensure correct initial state
+toggle_profile_fields()
 
 
 # === Bottom Button ===

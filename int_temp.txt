@@ -11,11 +11,11 @@ RUN load.rf /call
    set VESSEL = {{vessel}} ` This is set by the GUI
 `=== Sail Area =================================================
 `ZERO IF MODEL INCLUDE FULL PROFILE AREA
-   set AREA = 268					         `PROFILE AREA IN SQUARE FEET
-   set ARM_ABOVE_TO_BELOW_WL = 5.558	`DISTANCE FROM UNDERWATER CENTROID TO ABOVE WATER CENTROID
+   set AREA = {{wind_area}}					         `PROFILE AREA IN SQUARE FEET
+   set ARM_ABOVE_TO_BELOW_WL = {{wind_arm}}	`DISTANCE FROM UNDERWATER CENTROID TO ABOVE WATER CENTROID
 `=== Rank Geometry =============================================
 `If no tanks exist in model change that 0 to the FSM from submission
-   set NOTANKSFS = 0
+   set NOTANKSFS = {{notanksfs}}
 `=== Downflooding Points =======================================
 MACRO CRITICAL
 CRIT (*) OFF
