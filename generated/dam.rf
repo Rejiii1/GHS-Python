@@ -11,17 +11,7 @@ RUN INT.RF /CALL /QUIET
 `SHOULD DAMAGE TO THE SIDE OF LIST/TCG
 variable(string) DC0
 SET DC0 = "" 
-variable(string) DC1
-SET DC1 = "asdasd"
-PERM ("asdasd") "0.95"
 
-variable(string) DC2
-SET DC2 = "asdasd"
-PERM ("asdasd") "0.95"
-
-variable(string) DC3
-SET DC3 = "asd"
-PERM ("asd") "0.95"
 
 `=== Change any permiability ====================================
 MACRO PERM				

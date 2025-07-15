@@ -12,13 +12,14 @@ import os
 
 #GUI
 #tabs
-from tab_damage import create_damage_tab
+from tabs.tab_damage import create_damage_tab
 
 
-
-# Load the template
-def load_template():
-    with open("ls_temp.txt", "r") as f:
+# Function to load a template file from the templates directory
+def load_template_file(filename):
+    template_dir = os.path.join(os.path.dirname(__file__), "templates")
+    path = os.path.join(template_dir, filename)
+    with open(path, "r") as f:
         return f.read()
 
 # content‑to‑percent for each macro tank stage
@@ -292,8 +293,7 @@ def generate_document():
 
     for template_file, output_file in templates.items():
         try:
-            with open(template_file, "r") as f:
-                template = f.read()
+            template = load_template_file(template_file)
         except FileNotFoundError:
             messagebox.showerror("Template Error", f"Template not found: {template_file}")
             continue
