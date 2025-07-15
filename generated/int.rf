@@ -5,7 +5,7 @@ RUN load.rf /call
    set LENGTH = {LOA}		`LBP IN FEET
 `=== Select Route ==============================================
    `set ROUTE = "PROTECT", "PARTIAL", "EXPOSED"
-   set ROUTE = EXPOSED `This is set by the GUI
+   set ROUTE = PARTIAL `This is set by the GUI
 `=== Select Vessel Type ========================================
    `set VESSEL = POWER, PONTOON, RHIB, MONOSAIL, CATSAIL
    set VESSEL = RHIB ` This is set by the GUI

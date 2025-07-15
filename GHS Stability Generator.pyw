@@ -9,6 +9,13 @@ from tkinter import ttk, messagebox
 from datetime import datetime
 import os
 
+
+#GUI
+#tabs
+from tab_damage import create_damage_tab
+
+
+
 # Load the template
 def load_template():
     with open("ls_temp.txt", "r") as f:
@@ -250,7 +257,28 @@ def generate_document():
     pontoon_replacements["{{headlcg}}"] = head_lcg_val
     pontoon_replacements["{{headtcg}}"] = head_tcg_val
 
+    #damage stability logic
+    # Compartment standard
+    c_value = damage_widgets["compartment_standard_var"].get()
 
+    # Old T checkbox value
+    oldt_value = "set OLDT = Yes" if damage_widgets["oldt_var"].get() else ""
+
+    # Floodable Subdivisions logic
+    dcconditions_block = ""
+    for i, row in enumerate(damage_widgets["subdivisions"], start=1):
+        comp_name = row["entry"].get().strip()
+        perm = row["perm_entry"].get().strip()
+
+        if comp_name:
+            dcconditions_block += (
+                f"variable(string) DC{i}\n"
+                f'SET DC{i} = "{comp_name}"\n'
+                f'PERM ("{comp_name}") "{perm}"\n\n'
+            )
+
+
+    
 
     # Define your templates and output filenames
     templates = {
@@ -309,6 +337,9 @@ def generate_document():
             .replace("{{wind_area}}", wind_area)
             .replace("{{wind_arm}}",  wind_arm)
             .replace("{{notanksfs}}", notanksfs)
+            .replace("{{c}}", c_value)
+            .replace("{{oldt}}", oldt_value)
+            .replace("{{dcconditions}}", dcconditions_block.strip())
         )
 
        # Apply pontoon-specific replacements IF this is the pontoon template
@@ -1047,6 +1078,9 @@ def toggle_profile_fields():
 
 # Ensure correct initial state
 toggle_profile_fields()
+
+# === TAB 5: Damage Stability ===
+damage_widgets = create_damage_tab(notebook)
 
 
 

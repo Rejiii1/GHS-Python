@@ -1,4 +1,4 @@
-REPORT OFF
+chatREPORT OFF
 CLEAR
 RUN INT.RF /CALL /QUIET
 .CRITICAL
@@ -8,35 +8,25 @@ RUN INT.RF /CALL /QUIET
  `set OLDT = Yes
 `===============================================================
 `DEFINE FLOODABLE SUBDIVISIONS TO CONSIDER
-variable(string) DC0
-variable(string) DC1
-variable(string) DC2
-variable(string) DC3
-variable(string) DC4
-variable(string) DC5
-variable(string) DC6
-`variable(string) DC7
-`variable(string) DC8
-`variable(string) DC9
-`variable(string) DC10
-
-`-----SET YOUR DAMAGE CONDITIONS HERE WITH COMBINATIONS OF COMPARTMENTS-----
 `SHOULD DAMAGE TO THE SIDE OF LIST/TCG
+variable(string) DC0
 SET DC0 = "" 
-SET DC1 = "FORE*"
-SET DC2 = "FW.c"
-SET DC3 = "FWDBNK.C"
-SET DC4 = "AFTBUNK.C"
-SET DC5 = "ENGRM.C"
-SET DC6 = "LAZ.C"
-`SET DC7 = "NAME"
-`SET DC8 = "NAME"
-`SET DC9 = "NAME"
-`SET DC10 = "NAME"
+variable(string) DC1
+SET DC1 = "asdasd"
+PERM ("asdasd") "0.95"
+
+variable(string) DC2
+SET DC2 = "asdasd"
+PERM ("asdasd") "0.95"
+
+variable(string) DC3
+SET DC3 = "asd"
+PERM ("asd") "0.95"
+
 `=== Change any permiability ====================================
 MACRO PERM				
 PERM (*) 0.95				`SETS ALL SPACES TO .95 
-PERM (ENGRM*) 0.85			`SETS ER TO .85 **CHECK COMPT NAME IN GF
+`PERM (ENGRM*) 0.85			`SETS ER TO .85 **CHECK COMPT NAME IN GF
 `PERM (GEN-ROOM*) 0.85
 /
 `===============================================================
