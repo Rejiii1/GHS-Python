@@ -51,6 +51,6 @@ Organized into task-specific tabs:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/ghs-runfile-creator.git
+   git clone https://github.com/Rejiii1/GHS-Python.git
    cd ghs-runfile-creator
 
