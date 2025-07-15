@@ -13,7 +13,7 @@ import os
 #GUI
 #tabs
 from tabs.tab_damage import create_damage_tab
-
+from tabs.tab_report import create_report_tab
 
 # Function to load a template file from the templates directory
 def load_template_file(filename):
@@ -34,15 +34,15 @@ load_patterns = {
 
 
 def generate_document():
-    hull = name_entry.get().strip()
-    sg_value = sg_label_to_value.get(sg_var.get(), "")
-    unit_length = length_label_to_value.get(length_var.get(), "")
-    unit_weight = weight_label_to_value.get(weight_var.get(), "")
+    hull = report_widgets["name_entry"].get().strip()
+    sg_value = report_widgets["sg_label_to_value"].get(report_widgets["sg_var"].get(), "")
+    unit_length = report_widgets["length_label_to_value"].get(report_widgets["length_var"].get(), "")
+    unit_weight = report_widgets["weight_label_to_value"].get(report_widgets["weight_var"].get(), "")
     selected_label = route_var.get().strip()
     route_value = route_label_to_value.get(selected_label, "")
-    fwd_draft = fwd_draft_entry.get().strip()
-    mid_draft = mid_draft_entry.get().strip()
-    aft_draft = aft_draft_entry.get().strip()
+    fwd_draft = report_widgets["fwd_draft_entry"].get().strip()
+    mid_draft = report_widgets["mid_draft_entry"].get().strip()
+    aft_draft = report_widgets["aft_draft_entry"].get().strip()
     beam = beam_entry.get().strip()
     length = length_entry.get().strip()
 
@@ -103,7 +103,7 @@ def generate_document():
     unit_value = f"UNITS {unit_var.get()}" if survey_label == "User Defined Lightship" else ""
 
 
-    custom_path = file_location_entry.get().strip()
+    custom_path = report_widgets["file_location_entry"].get().strip()
     if custom_path:
         output_dir = custom_path
     else:
@@ -369,74 +369,8 @@ notebook = ttk.Notebook(root)
 notebook.pack(fill="both", expand=True)
 
 # === TAB 1: Report Details ===
-tab_report = tk.Frame(notebook)
-notebook.add(tab_report, text="Report Details")
+report_widgets = create_report_tab(notebook)
 
-# File Location (optional)
-file_location_label = tk.Label(tab_report, text="File Location (optional):")
-file_location_label.pack(pady=(10, 0))
-file_location_entry = tk.Entry(tab_report, width=50)
-file_location_entry.pack(pady=(0, 10))
-
-# Geometry File Name
-tk.Label(tab_report, text="Geometry File Name:").pack(pady=(10, 0))
-name_entry = tk.Entry(tab_report, width=40)
-name_entry.pack()
-
-# Specific Gravity
-sg_var = tk.StringVar(value="Salt Water")
-sg_label_to_value = {
-    "Fresh Water": "1.000",
-    "Salt Water": "1.025"
-}
-tk.Label(tab_report, text="Specific Gravity:").pack(pady=(10, 0))
-sg_dropdown = ttk.Combobox(tab_report, textvariable=sg_var, values=list(sg_label_to_value.keys()), state="readonly")
-sg_dropdown.pack()
-
-# Report Units
-tk.Label(tab_report, text="Report Units", font=("Arial", 10, "bold")).pack(pady=(20, 0))
-
-units_frame = tk.Frame(tab_report)
-units_frame.pack(pady=5)
-
-# Length Units
-tk.Label(units_frame, text="Length:").grid(row=0, column=0, padx=10)
-length_var = tk.StringVar(value="Feet")
-length_label_to_value = {
-    "Feet": "F",
-    "Meters": "M"
-}
-length_dropdown = ttk.Combobox(units_frame, textvariable=length_var, values=list(length_label_to_value.keys()), state="readonly", width=10)
-length_dropdown.grid(row=1, column=0, padx=10)
-
-# Weight Units
-tk.Label(units_frame, text="Weight:").grid(row=0, column=1, padx=10)
-weight_var = tk.StringVar(value="Long Tons")
-weight_label_to_value = {
-    "Pounds": "LB",
-    "Long Tons": "LT"
-}
-weight_dropdown = ttk.Combobox(units_frame, textvariable=weight_var, values=list(weight_label_to_value.keys()), state="readonly", width=10)
-weight_dropdown.grid(row=1, column=1, padx=10)
-
-
-# === DRAFT LOCATIONS ===
-tk.Label(tab_report, text="Draft Locations", font=("Arial", 10, "bold")).pack(pady=(20, 5))
-
-draft_frame = tk.Frame(tab_report)
-draft_frame.pack()
-
-tk.Label(draft_frame, text="Forward").grid(row=0, column=0, padx=10)
-tk.Label(draft_frame, text="Midships").grid(row=0, column=1, padx=10)
-tk.Label(draft_frame, text="Aft").grid(row=0, column=2, padx=10)
-
-fwd_draft_entry = tk.Entry(draft_frame, width=12)
-mid_draft_entry = tk.Entry(draft_frame, width=12)
-aft_draft_entry = tk.Entry(draft_frame, width=12)
-
-fwd_draft_entry.grid(row=1, column=0, padx=10)
-mid_draft_entry.grid(row=1, column=1, padx=10)
-aft_draft_entry.grid(row=1, column=2, padx=10)
 
 
 # === TAB 2: Lightship ===
