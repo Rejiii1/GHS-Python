@@ -24,17 +24,6 @@ def load_template_file(filename):
     with open(path, "r") as f:
         return f.read()
 
-# content‑to‑percent for each macro tank stage
-load_patterns = {
-    "Departure": {"default": "MACRO TANK1",
-                  "load": {"Gasoline":0.95, "Diesel":0.95, "Fresh Water":0.95, "Bait":0.95, "Sewage":0.10}},
-    "Midway":    {"default": "MACRO TANK2",
-                  "load": {"Gasoline":0.50, "Diesel":0.50, "Fresh Water":0.50, "Bait":0.50, "Sewage":0.50}},
-    "Arrival":   {"default": "MACRO TANK3",
-                  "load": {"Gasoline":0.10, "Diesel":0.10, "Fresh Water":0.10, "Bait":0.10, "Sewage":0.95}}
-}
-
-
 def generate_document():
     global initial_weights, add_weights
  #Report Tab ================================================
@@ -100,6 +89,7 @@ def generate_document():
     paxvcg = pax_vcg_entry.get().strip()
  #  Generators
  #  Call generators for Loads Tab
+    from utils.constants import load_patterns
     from utils.generators import (
             generate_additional_weights_block,
             generate_macro_tanks_block,
@@ -396,14 +386,8 @@ add_button = tk.Button(weights_frame, text="➕ Add Initial Weight", command=add
 add_button.grid(row=1, column=0, columnspan=8, pady=5)
 
 # === INITIAL TANKS ===
-# Content types and their default specific gravity
-contents_to_sg = {
-    "Gasoline": "0.74",
-    "Fresh Water": "1.00",
-    "Sewage": "1.025",
-    "Diesel": "0.85",
-    "Bait": "1.025"
-}
+#pulling in the contents to specific gravity mapping for tanks
+from utils.constants import contents_to_sg
 
 
 initial_tanks = []

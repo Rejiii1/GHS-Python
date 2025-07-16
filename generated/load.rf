@@ -29,14 +29,17 @@ MACRO ADDSTUFF
 `-----Departure Tanks-----
 MACRO TANK1
 `LOAD (TANK) %
+LOAD () 0.95
 /
 `-----Midway Tanks-----
 MACRO TANK2
 `LOAD (TANK) %
+LOAD () 0.5
 /
 `-----Arrival Tanks-----
 MACRO TANK3
 `LOAD (TANK) %
+LOAD () 0.1
 /
 
 `=== Extra Load Cases Here ========================================
