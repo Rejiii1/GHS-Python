@@ -15,6 +15,8 @@ import os
 from tabs.tab_damage import create_damage_tab
 from tabs.tab_report import create_report_tab
 
+
+
 # Function to load a template file from the templates directory
 def load_template_file(filename):
     template_dir = os.path.join(os.path.dirname(__file__), "templates")
@@ -45,6 +47,11 @@ def generate_document():
     aft_draft = report_widgets["aft_draft_entry"].get().strip()
     beam = beam_entry.get().strip()
     length = length_entry.get().strip()
+
+    #Generators from utils/generators.py
+    from utils.generators import generate_initial_weights_block
+    from utils.generators import generate_initial_tanks_block
+    from utils.generators import generate_additional_weights_block
 
     if not tank_model_var.get():
         notanksfs = fs_entry.get().strip()
@@ -111,54 +118,11 @@ def generate_document():
 
     os.makedirs(output_dir, exist_ok=True)
 
-# Prepare the initial weights block
-    initial_weights_block = ""
-    grouped_by_units = {"LB": [], "LT": []}
+# Prepare the initial weights block - moved to utils/generators.py
+    initial_weights_block = generate_initial_weights_block(initial_weights)
 
-    for row in initial_weights:
-        action = row["action"].get().strip().upper()
-        item = row["item"].get().strip()
-        weight = row["weight"].get().strip()
-        units = row["units"].get().strip().upper()
-        initial_wt_lcg = row["initial_wt_lcg"].get().strip()
-        initial_wt_tcg = row["initial_wt_tcg"].get().strip()
-        initial_wt_vcg = row["initial_wt_vcg"].get().strip()
-
-        if not action or not item or not weight or not initial_wt_lcg or not initial_wt_tcg or not initial_wt_vcg or units not in grouped_by_units:
-            continue
-
-        # Negate weight for ADD, leave it for REMOVE
-        try:
-            weight_str = weight.strip()
-            if action == "ADD":
-                if not weight_str.startswith("-"):
-                    weight_str = f"-{weight_str}"
-            else:
-                weight_str = weight_str.lstrip("-")
-        except ValueError:
-            continue  # skip invalid weight input
-
-        grouped_by_units[units].append((item, weight_str, initial_wt_lcg, initial_wt_tcg, initial_wt_vcg))
-
-    # Build output
-    for unit, rows in grouped_by_units.items():
-        if rows:
-            initial_weights_block += f"UNITS {unit}\n"
-            for item, weight, initial_wt_lcg, initial_wt_tcg, initial_wt_vcg in rows:
-                initial_weights_block += f'ADD "{item}" {weight} {initial_wt_lcg} {initial_wt_tcg} {initial_wt_vcg}\n'
-
-    # === Prepare Initial Tanks Block ===
-    initial_tanks_block = ""
-
-    for tank in initial_tanks:
-        tank_name = tank["name"].get().strip()
-        contents = tank["contents"].get().strip()
-        sg = tank["sg"].get().strip()
-        load = tank["load"].get().strip()
-
-        initial_tanks_block += f"TANK {tank_name}\n"
-        initial_tanks_block += f"CONTENTS {sg}\n"
-        initial_tanks_block += f"LOAD ({tank_name}) {load}\n\n"
+# === Prepare Initial Tanks Block === moved to utils/generators.py
+    initial_tanks_block = generate_initial_tanks_block(initial_tanks)
 
 # === PASSENGER INFO ===
     paxct = pax_count_entry.get().strip()
@@ -167,34 +131,8 @@ def generate_document():
     paxtcg = pax_tcg_entry.get().strip()
     paxvcg = pax_vcg_entry.get().strip()
 
-    # === ADDITIONAL WEIGHTS BLOCK ===
-    addstuff_block = ""
-    grouped_add_by_units = {"LB": [], "LT": []}
-
-    for row in add_weights:
-        item = row["item"].get().strip()
-        weight = row["weight"].get().strip()
-        units = row["units"].get().strip().upper()
-        lcg = row["lcg"].get().strip()
-        tcg = row["tcg"].get().strip()
-        vcg = row["vcg"].get().strip()
-
-        if not item or not weight or not lcg or not tcg or not vcg or units not in grouped_add_by_units:
-            continue
-
-        try:
-            weight_str = weight.strip()
-        except ValueError:
-            continue  # skip invalid
-
-        grouped_add_by_units[units].append((item, weight_str, lcg, tcg, vcg))
-
-    # Format grouped
-    for unit, rows in grouped_add_by_units.items():
-        if rows:
-            addstuff_block += f"UNITS {unit}\n"
-            for item, weight, lcg, tcg, vcg in rows:
-                addstuff_block += f'ADD "{item}" {weight} {lcg} {tcg} {vcg}\n'
+# === ADDITIONAL WEIGHTS BLOCK === moved to utils/generators.py
+    addstuff_block = generate_additional_weights_block(add_weights)
 
 # === FSM Tanks List ===
     fsm_tanks_list = [
@@ -653,7 +591,7 @@ def add_load_row():
         "tcg": tk.Entry(add_weights_frame, width=8),
         "vcg": tk.Entry(add_weights_frame, width=8)
     }
-    row_data["units"].set("LT")
+    row_data["units"].set("LB")
 
     row_data["item"].grid(row=row_idx, column=0, padx=2)
     row_data["weight"].grid(row=row_idx, column=1, padx=2)
@@ -863,17 +801,6 @@ def update_pontoon_tab(*args):
         notebook.forget(pontoon_tab)
         pontoon_tab = None
 
-def update_pontoon_tab(*args):
-    global pontoon_tab
-    if vessel_var.get() == "Pontoon Boat" and pontoon_tab is None:
-        pontoon_tab = tk.Frame(notebook)
-        notebook.add(pontoon_tab, text="Pontoon")
-        # build the full pontoon UI here
-        build_pontoon_content(pontoon_tab)
-
-    elif vessel_var.get() != "Pontoon Boat" and pontoon_tab is not None:
-        notebook.forget(pontoon_tab)
-        pontoon_tab = None
 
 # Hook the trace *after* creating the combobox
 vessel_var.trace_add("write", update_pontoon_tab)

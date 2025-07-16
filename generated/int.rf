@@ -8,7 +8,7 @@ RUN load.rf /call
    set ROUTE = PARTIAL `This is set by the GUI
 `=== Select Vessel Type ========================================
    `set VESSEL = POWER, PONTOON, RHIB, MONOSAIL, CATSAIL
-   set VESSEL = POWER ` This is set by the GUI
+   set VESSEL = MONOSAIL ` This is set by the GUI
 `=== Sail Area =================================================
 `ZERO IF MODEL INCLUDE FULL PROFILE AREA
    set AREA = 0					         `PROFILE AREA IN SQUARE FEET
@@ -19,7 +19,7 @@ RUN load.rf /call
 `=== Downflooding Points =======================================
 MACRO CRITICAL
 CRIT (*) OFF
-  `Downflooding points set by GUI
+CRIT (1) "3" 33 3 3/flood/symmetrical  `Downflooding points set by GUI
 CRIT (*) REPORT
 /
 `===============================================================
