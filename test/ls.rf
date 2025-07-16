@@ -1,6 +1,6 @@
 CLEAR
 echo OFF
-READ 12
+READ test
 run macro.lib /call
 
 `----------SET VARIABLES----------
@@ -12,13 +12,13 @@ UNITS LT		`SETS THE UNIT FOR INPUT
 	set SG 			= 1.025			`SPECIFIC GRAV FOR WATER FOR ANALYSIS (1.025 OR 1.00)
 	set OPTION		= 2		`1 DEADWEIGHT - 2 INCLINING - 3 USER LIGHTSHIP
 	set VERT		= 1			`NEED FOR OPTION 1 - CONSERVATIVE VCG SET FOR DEADWEIGHT
-	set GMMT		= 			`NEED FOR OPTION 2 - FROM MOMTAN TAB OF SPREADSHEET "a" (ft-LT) for INCLINING
+	set GMMT		= 23			`NEED FOR OPTION 2 - FROM MOMTAN TAB OF SPREADSHEET "a" (ft-LT) for INCLINING
 `=========Draft Locations=========================================
-	set FWDDRLOC = 21		`QUERY MODEL TO FIND DRAFTS AT THESE 3 LOCATIONS
-	set MIDDRLOC = 1		
-	set AFTDRLOC = 21		
+	set FWDDRLOC = 2		`QUERY MODEL TO FIND DRAFTS AT THESE 3 LOCATIONS
+	set MIDDRLOC = 23		
+	set AFTDRLOC = 23		
 `=======OPTION 1 or 2 - Paste Excel for Survey Here===============
- `This is set by the GUI
+23 `This is set by the GUI
 `=======OPTION 3 - For user lightship set here====================
 MACRO KNOWNLTSH	
 .ZERO
@@ -30,12 +30,19 @@ SOLVE
 `===============================================================
 `------------ADD/REMOVE THE INITIAL WEIGHTS FROM LTSH-----------
 MACRO INITIALWEIGHTS
- `Initial weights block set by GUI
+UNITS LB
+ADD "wd" -wd wd w edwdw `Initial weights block set by GUI
 /
 
 `-----------------------TANK CONDITIONS-------------------------
 Macro INITIALTANKS
- `Initial tanks block set by GUI
+TANK ewew
+CONTENTS 0.74
+LOAD (ewew) we
+
+TANK 23
+CONTENTS 1.00
+LOAD (23) dh `Initial tanks block set by GUI
 /
 `===============================================================
 .LTSHRPRT

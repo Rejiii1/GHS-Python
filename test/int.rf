@@ -8,18 +8,18 @@ RUN load.rf /call
    set ROUTE = EXPOSED `This is set by the GUI
 `=== Select Vessel Type ========================================
    `set VESSEL = POWER, PONTOON, RHIB, MONOSAIL, CATSAIL
-   set VESSEL = RHIB ` This is set by the GUI
+   set VESSEL = PONTOON ` This is set by the GUI
 `=== Sail Area =================================================
 `ZERO IF MODEL INCLUDE FULL PROFILE AREA
-   set AREA = 0					         `PROFILE AREA IN SQUARE FEET
-   set ARM_ABOVE_TO_BELOW_WL = 0	`DISTANCE FROM UNDERWATER CENTROID TO ABOVE WATER CENTROID
+   set AREA = SDG					         `PROFILE AREA IN SQUARE FEET
+   set ARM_ABOVE_TO_BELOW_WL = SDG	`DISTANCE FROM UNDERWATER CENTROID TO ABOVE WATER CENTROID
 `=== Rank Geometry =============================================
 `If no tanks exist in model change that 0 to the FSM from submission
-   set NOTANKSFS = 0
+   set NOTANKSFS = dfs
 `=== Downflooding Points =======================================
 MACRO CRITICAL
 CRIT (*) OFF
-  `Downflooding points set by GUI
+CRIT (1) "sDF" sdf sdf SH/flood/symmetrical  `Downflooding points set by GUI
 CRIT (*) REPORT
 /
 `===============================================================

@@ -36,188 +36,143 @@ load_patterns = {
 
 
 def generate_document():
+    global initial_weights, add_weights
+ #Report Tab ================================================
+ # Widgets
     hull = report_widgets["name_entry"].get().strip()
     sg_value = report_widgets["sg_label_to_value"].get(report_widgets["sg_var"].get(), "")
     unit_length = report_widgets["length_label_to_value"].get(report_widgets["length_var"].get(), "")
     unit_weight = report_widgets["weight_label_to_value"].get(report_widgets["weight_var"].get(), "")
-    selected_label = route_var.get().strip()
-    route_value = route_label_to_value.get(selected_label, "")
     fwd_draft = report_widgets["fwd_draft_entry"].get().strip()
     mid_draft = report_widgets["mid_draft_entry"].get().strip()
     aft_draft = report_widgets["aft_draft_entry"].get().strip()
-    beam = beam_entry.get().strip()
-    length = length_entry.get().strip()
-
-    #Generators from utils/generators.py
-    from utils.generators import generate_initial_weights_block
-    from utils.generators import generate_initial_tanks_block
-    from utils.generators import generate_additional_weights_block
-
-    if not tank_model_var.get():
-        notanksfs = fs_entry.get().strip()
-    else:
-        notanksfs = "0"
-
-
-    if not profile_var.get():
-        wind_area = wind_area_entry.get().strip()
-        wind_arm  = wind_arm_entry.get().strip()
-    else:
-        wind_area = "0"
-        wind_arm  = "0"
-
-    global initial_weights, add_weights
-
-    
-
-    vessel_label = vessel_var.get().strip()
-    vessel_value = vessel_label_to_value.get(vessel_label, "")
-
     survey_label = survey_var.get().strip()
     survey_value = survey_label_to_value.get(survey_label, "")
-
-    if not hull or not route_value or not vessel_value or not survey_value:
-        messagebox.showwarning("Missing info", "Please fill in all fields and select valid options.")
-        return
-
-    # These will be optionally filled
+ #  Generators
+ #  Call generators for Report Tab
+    from utils.generators import (resolve_output_directory)
+ #  Resolve output directory
+    custom_path = report_widgets["file_location_entry"].get().strip()
+    output_dir = resolve_output_directory(custom_path)
+    
+ #Lightship Tab ================================================
+ #  Widgets - not yet widgets
+     # Preset survey options in case not used
     excel_data = ""
     vert_value = "1"
     gmmt_value = "1"
     disp = ltsh_lcg = ltsh_tcg = ltsh_vcg = ""
 
-    # Safe defaults in case there are no initial weights
-    initial_wt_lcg = ""
-    initial_wt_tcg = ""
-    initial_wt_vcg = ""
-
-
     if survey_label in ["Deadweight Survey", "Inclining Experiment"]:
         excel_data = excel_text.get("1.0", tk.END).strip()
-
     if survey_label == "Deadweight Survey":
         vert_value = vert_entry.get().strip()
-
     if survey_label == "Inclining Experiment":
         gmmt_value = gmmt_entry.get().strip()
-
     if survey_label == "User Defined Lightship":
         disp = disp_entry.get().strip()
         ltsh_lcg = ltsh_lcg_entry.get().strip()
         ltsh_tcg = ltsh_tcg_entry.get().strip()
         ltsh_vcg = ltsh_vcg_entry.get().strip()
-
     unit_value = f"UNITS {unit_var.get()}" if survey_label == "User Defined Lightship" else ""
-
-
-    custom_path = report_widgets["file_location_entry"].get().strip()
-    if custom_path:
-        output_dir = custom_path
-    else:
-        output_dir = os.path.join(os.getcwd(), "generated")
-
-    os.makedirs(output_dir, exist_ok=True)
-
-# Prepare the initial weights block - moved to utils/generators.py
+ #  Generators
+ #  Call generators for Lightship Tab
+    from utils.generators import (
+        generate_initial_weights_block, 
+        generate_initial_tanks_block
+    )
+ # Prepare Initial Weights Block
+     # Safe defaults in case there are no initial weights
+    initial_wt_lcg = ""
+    initial_wt_tcg = ""
+    initial_wt_vcg = ""
     initial_weights_block = generate_initial_weights_block(initial_weights)
-
-# === Prepare Initial Tanks Block === moved to utils/generators.py
+ # Prepare Initial Tanks Block
     initial_tanks_block = generate_initial_tanks_block(initial_tanks)
 
-# === PASSENGER INFO ===
+ #Loads Tab ==============================================================
+ #  Widgets - not yet widgets
+    # === PASSENGER INFO ===
     paxct = pax_count_entry.get().strip()
     paxwt = pax_weight_entry.get().strip()
     paxlcg = pax_lcg_entry.get().strip()
     paxtcg = pax_tcg_entry.get().strip()
     paxvcg = pax_vcg_entry.get().strip()
-
-# === ADDITIONAL WEIGHTS BLOCK === moved to utils/generators.py
+ #  Generators
+ #  Call generators for Loads Tab
+    from utils.generators import (
+            generate_additional_weights_block,
+            generate_macro_tanks_block,
+        )
+ #  Additional Weights Block
     addstuff_block = generate_additional_weights_block(add_weights)
-
-# === FSM Tanks List ===
+ #  Macro Tanks Sections
+    macro_block = generate_macro_tanks_block(load_patterns, load_tanks)
+ # Create the FSM list of real Tanks
     fsm_tanks_list = [
         t["name_widget"].get().strip()
         for t in load_tanks
         if t["name_widget"].get().strip()
     ]
     fsm_tanks = " ".join(fsm_tanks_list)
-
-    # === Macro Tanks Sections ===
-    macro_block = ""
-    for stage in ["Departure", "Midway", "Arrival"]:
-        info = load_patterns[stage]
-        macro_block += f"`-----{stage} Tanks-----\n"
-        macro_block += f"{info['default']}\n"
-        macro_block += "`LOAD (TANK) %\n"
-        # pair up name widgets and contents
-        for t in load_tanks:
-            name = t["name_widget"].get().strip()
-            contents = t["contents_var"].get()
-            pct = info["load"][contents]
-            macro_block += f"LOAD ({name}) {pct}\n"
-        macro_block += "/\n"
-
-    # === CRITICAL POINTS BLOCK ===
-    crit_block = ""
-    for er in critical_points:
-        num   = er["num_lbl"].cget("text")
-        name  = er["name_ent"].get().strip()
-        lon   = er["long_ent"].get().strip()
-        tra   = er["trans_ent"].get().strip()
-        ver   = er["vert_ent"].get().strip()
-        if not name or not lon or not tra or not ver:
-            continue
-        crit_block += f'CRIT ({num}) "{name}" {lon} {tra} {ver}/flood/symmetrical\n'
-
-    # --- PONTOON-SPECIFIC DATA EXTRACTION (DO THIS ONCE, BEFORE THE TEMPLATE LOOP) ---
-    pontoon_replacements = {}
-    head_lcg_val = ""
-    head_tcg_val = ""
-
-    if pontoon_tab: # Check if pontoon_tab exists
-        for table in (pontoon_tab.crowd2, pontoon_tab.crowd5):
-            for row in table:
-                code     = row["code"]                    # e.g. "105"
-                lcg_val  = row["lcg"].get().strip()
-                tcg_val  = row["tcg"].get().strip()
-                head_val = "1" if row["head"].get() else "0"
-
-                pontoon_replacements[f"{{{{lcg{code}}}}}"] = lcg_val
-                pontoon_replacements[f"{{{{tcg{code}}}}}"] = tcg_val
-                pontoon_replacements[f"{{{{head{code}}}}}"] = head_val
-        
-        # Retrieve head LCG and TCG only if the pontoon tab exists and entries are populated
-        if hasattr(pontoon_tab, 'headlcg_entry') and pontoon_tab.headlcg_entry.get().strip():
-            head_lcg_val = pontoon_tab.headlcg_entry.get().strip()
-        if hasattr(pontoon_tab, 'headtcg_entry') and pontoon_tab.headtcg_entry.get().strip():
-            head_tcg_val = pontoon_tab.headtcg_entry.get().strip()
-    
-    # Add head LCG/TCG to replacements
-    pontoon_replacements["{{headlcg}}"] = head_lcg_val
-    pontoon_replacements["{{headtcg}}"] = head_tcg_val
-
-    #damage stability logic
-    # Compartment standard
-    c_value = damage_widgets["compartment_standard_var"].get()
-
-    # Old T checkbox value
-    oldt_value = "set OLDT = Yes" if damage_widgets["oldt_var"].get() else ""
-
-    # Floodable Subdivisions logic
-    dcconditions_block = ""
-    for i, row in enumerate(damage_widgets["subdivisions"], start=1):
-        comp_name = row["entry"].get().strip()
-        perm = row["perm_entry"].get().strip()
-
-        if comp_name:
-            dcconditions_block += (
-                f"variable(string) DC{i}\n"
-                f'SET DC{i} = "{comp_name}"\n'
-                f'PERM ("{comp_name}") "{perm}"\n\n'
-            )
+ #  FSM for Manual Tank Entry 
+    if not tank_model_var.get():
+        notanksfs = fs_entry.get().strip()
+    else:
+        notanksfs = "0"
 
 
-    
+ #Intact Stability Tab =======================================================
+ #  Widgets - Not yet widgets
+    selected_label = route_var.get().strip()
+    route_value = route_label_to_value.get(selected_label, "")
+    beam = beam_entry.get().strip()
+    length = length_entry.get().strip()
+    vessel_label = vessel_var.get().strip()
+    vessel_value = vessel_label_to_value.get(vessel_label, "")
+ # Wind Area and Arm Manual
+    if not profile_var.get():
+        wind_area = wind_area_entry.get().strip()
+        wind_arm  = wind_arm_entry.get().strip()
+    else:
+        wind_area = "0"
+        wind_arm  = "0"
+ #  Generators
+ #  Call the Generators for Intact Stability Tab
+    from utils.generators import (
+        generate_critical_points_block,
+        generate_pontoon_replacements
+    )
+ # Critical Points Block
+    crit_block = generate_critical_points_block(critical_points)
+
+
+
+ #Damage Stability Tab =====================================================
+ #  Widgets - not yet widgets
+ #  None
+ #  Generators
+ #  Call the Generators for Damage Stability Tab
+    from utils.generators import (generate_damage_stability_block)
+ #  Damage stability logic 
+    c_value, oldt_value, dcconditions_block = generate_damage_stability_block(damage_widgets)
+
+ #Pontoon Tab ==============================================================
+ #  Widgets - not yet widgets
+ #  None
+ #  Generators
+ # Call the Generators for Pontoon Stability Tab
+    from utils.generators import (generate_pontoon_replacements)
+ # PONTOON-SPECIFIC DATA EXTRACTION (DO THIS ONCE, BEFORE THE TEMPLATE LOOP)
+    pontoon_replacements = generate_pontoon_replacements(pontoon_tab)
+
+
+
+ #fill in these fields error message
+    if not hull or not route_value or not vessel_value or not survey_value:
+        messagebox.showwarning("Missing info", "Please fill in all fields and select valid options.")
+        return
+
 
     # Define your templates and output filenames
     templates = {
