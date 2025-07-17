@@ -12,14 +12,12 @@ RUN INT.RF /CALL /QUIET
 variable(string) DC0
 SET DC0 = "" 
 
-
 `=== Change any permiability ====================================
 MACRO PERM				
-PERM (*) 0.95				`SETS ALL SPACES TO .95 
+`PERM (*) 0.95				`SETS ALL SPACES TO .95 
+
 `PERM (ENGRM*) 0.85			`SETS ER TO .85 **CHECK COMPT NAME IN GF
 `PERM (GEN-ROOM*) 0.85
-
-`permiability IS BROKEN! FIX GUI TO MAKE THE MACRO PERM
 /
 `===============================================================
 SET DAMCOUNT = 1

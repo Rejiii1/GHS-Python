@@ -143,11 +143,11 @@ def generate_document():
 
 
 
- #fill in these fields error message
-    if not hull or not route_value or not vessel_value or not survey_value:
-        messagebox.showwarning("Missing info",
-                               "Please fill in all fields and select valid options.")
-        return
+ #fill in these fields error message - tabbed out b/c annoying
+ #   if not hull or not survey_value:
+ #       messagebox.showwarning("Missing info",
+ #                              "Please fill in all fields and select valid options.")
+ #       return
 
 
     # Define your templates and output filenames

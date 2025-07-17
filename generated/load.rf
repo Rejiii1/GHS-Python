@@ -1,7 +1,7 @@
 Clear
 run ls.rf /call /quiet
 `===============================================================
-	set PAXCT	= 6		`Max number of Passengers
+	set PAXCT	= 		`Max number of Passengers
 	set PAXWT	= 185		`Avg Pax Weight
 `--------Locations-----------
 	set PAXLCG	= 		`LCG of Normal Pax loading
@@ -23,14 +23,7 @@ PERM (*) 0.98
 `===============================================================
 `----------Added Stuff (Every LC)------------
 MACRO ADDSTUFF
-UNITS LB
-ADD "6" 6 6 6 6
-ADD "5" 5 5 5 5
-ADD "4" 4 4 4 4
-ADD "3" 3 3 3 3
-ADD "2" 2 2 2 2
-ADD "1" 1 1 1 1
-ADD "8" 8 8 8 8 `added every load case from GUI
+ `added every load case from GUI
 /
 `----------Tank Conditions---------------
 `-----Departure Tanks-----
