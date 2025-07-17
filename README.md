@@ -22,7 +22,7 @@ Organized into task-specific tabs:
 - 🧭 **Intact Stability** – Select vessel type and operating route.
   - 🧍‍♂️ **Passenger Weights** – Input count, weight, and CGs for passengers.
   - ➕ **Additional Weights** – Define other load items for inclusion in the run file.
-` 🌊 **Damage Stability** - Add Compartment names and permiabilities to run damage load cases
+- 🌊 **Damage Stability** - Add Compartment names and permiabilities to run damage load cases
 
 ### 📐 Pontoon Crowding 
 - Cowding info via dedicated crowding tables for 2 sqft and 5 sqft configurations.
