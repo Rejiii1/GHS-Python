@@ -155,14 +155,14 @@ def generate_damage_stability_block(damage_widgets):
 
 
 # Pontoon Replacements Generator
-def generate_pontoon_replacements(pontoon_tab):
+def generate_pontoon_replacements(pontoon_widgets):
     """Generates the replacements for pontoon data."""
     pontoon_replacements = {}
     head_lcg_val = ""
     head_tcg_val = ""
 
-    if pontoon_tab:
-        for table in (pontoon_tab.crowd2, pontoon_tab.crowd5):
+    if pontoon_widgets:
+        for table in (pontoon_widgets["crowd2"], pontoon_widgets["crowd5"]):
             for row in table:
                 code = row["code"]
                 lcg_val = row["lcg"].get().strip()
@@ -173,12 +173,11 @@ def generate_pontoon_replacements(pontoon_tab):
                 pontoon_replacements[f"{{{{tcg{code}}}}}"] = tcg_val
                 pontoon_replacements[f"{{{{head{code}}}}}"] = head_val
 
-        if hasattr(pontoon_tab, 'headlcg_entry') and pontoon_tab.headlcg_entry.get().strip():
-            head_lcg_val = pontoon_tab.headlcg_entry.get().strip()
-        if hasattr(pontoon_tab, 'headtcg_entry') and pontoon_tab.headtcg_entry.get().strip():
-            head_tcg_val = pontoon_tab.headtcg_entry.get().strip()
+        head_lcg_val = pontoon_widgets["headlcg_entry"].get().strip()
+        head_tcg_val = pontoon_widgets["headtcg_entry"].get().strip()
 
     pontoon_replacements["{{headlcg}}"] = head_lcg_val
     pontoon_replacements["{{headtcg}}"] = head_tcg_val
 
     return pontoon_replacements
+
