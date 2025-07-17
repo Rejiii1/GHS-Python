@@ -1,10 +1,15 @@
-# tab_lightship.py
+"""Lightship Tab for Ship Stability Application
+This module creates the Lightship tab in the main application notebook.
+"""
 
 import tkinter as tk
 from tkinter import ttk
+
+#Used in initial tanks section for the default specific Gravity
 from utils.constants import contents_to_sg
 
 def create_lightship_tab(notebook):
+    """Creates the Lightship tab in the main GUI."""
     tab_lightship = tk.Frame(notebook)
     notebook.add(tab_lightship, text="Lightship")
 
@@ -15,7 +20,8 @@ def create_lightship_tab(notebook):
         "User Defined Lightship": "3"
     }
     survey_options = list(survey_label_to_value.keys())
-    survey_dropdown = ttk.Combobox(tab_lightship, textvariable=survey_var, values=survey_options, state="readonly")
+    survey_dropdown = ttk.Combobox(tab_lightship, textvariable=survey_var,
+                                   values=survey_options, state="readonly")
     tk.Label(tab_lightship, text="Survey Type:").pack(pady=(10, 0))
     survey_dropdown.pack()
 
@@ -78,7 +84,8 @@ def create_lightship_tab(notebook):
             tk.Label(entry_frame, text="VCG").grid(row=0, column=4)
 
             disp_entry = tk.Entry(entry_frame, width=10)
-            unit_dropdown = ttk.Combobox(entry_frame, textvariable=unit_var, values=["LB", "LT"], state="readonly", width=6)
+            unit_dropdown = ttk.Combobox(entry_frame, textvariable=unit_var,
+                                         values=["LB", "LT"], state="readonly", width=6)
             ltsh_lcg_entry = tk.Entry(entry_frame, width=10)
             ltsh_tcg_entry = tk.Entry(entry_frame, width=10)
             ltsh_vcg_entry = tk.Entry(entry_frame, width=10)
@@ -114,13 +121,15 @@ def create_lightship_tab(notebook):
         if not header_created:
             header = ["Action", "Item Name", "Weight", "Units", "LCG", "TCG", "VCG", ""]
             for col, label in enumerate(header):
-                tk.Label(weights_frame, text=label, font=("Arial", 10, "bold")).grid(row=0, column=col, padx=4, pady=2)
+                tk.Label(weights_frame, text=label,
+                         font=("Arial", 10, "bold")).grid(row=0, column=col, padx=4, pady=2)
             header_created = True
 
         row_idx = len(initial_weights) + 1
 
         row_data = {
-            "action": ttk.Combobox(weights_frame, values=["ADD", "REMOVE"], width=6, state="readonly"),
+            "action": ttk.Combobox(weights_frame, values=["ADD", "REMOVE"],
+                                   width=6, state="readonly"),
             "item": tk.Entry(weights_frame, width=12),
             "weight": tk.Entry(weights_frame, width=8),
             "units": ttk.Combobox(weights_frame, values=["LB", "LT"], width=6, state="readonly"),
@@ -157,10 +166,6 @@ def create_lightship_tab(notebook):
     add_button.grid(row=1, column=0, columnspan=8, pady=5)
 
     # === INITIAL TANKS ===
-    #pulling in the contents to specific gravity mapping for tanks
-    from utils.constants import contents_to_sg
-
-
     initial_tanks = []
     tank_header_created = False
     ltsh_tanks_frame = tk.Frame(tab_lightship)
@@ -177,7 +182,8 @@ def create_lightship_tab(notebook):
         if not tank_header_created:
             header = ["Tank Name", "Contents", "Specific Gravity", "Load"]
             for col, label in enumerate(header):
-                tk.Label(ltsh_tanks_frame, text=label, font=("Arial", 10, "bold")).grid(row=0, column=col, padx=4, pady=2)
+                tk.Label(ltsh_tanks_frame, text=label,
+                         font=("Arial", 10, "bold")).grid(row=0, column=col, padx=4, pady=2)
             tank_header_created = True
 
         row_idx = len(initial_tanks) + 1
@@ -185,7 +191,8 @@ def create_lightship_tab(notebook):
         name_entry = tk.Entry(ltsh_tanks_frame, width=15)
         contents_var = tk.StringVar()
         contents_dropdown = ttk.Combobox(ltsh_tanks_frame, textvariable=contents_var,
-                                        values=list(contents_to_sg.keys()) + ["Other"], state="readonly", width=12)
+                                        values=list(contents_to_sg.keys()) + ["Other"],
+                                        state="readonly", width=12)
         sg_entry = tk.Entry(ltsh_tanks_frame, width=10)
         load_entry = tk.Entry(ltsh_tanks_frame, width=10)
 
@@ -228,7 +235,9 @@ def create_lightship_tab(notebook):
         reposition_ltsh_tank_button()
 
 
-    ltsh_tank_button = tk.Button(ltsh_tanks_frame, text="➕ Add Initial Tank", command=ltsh_add_tank_row)
+    ltsh_tank_button = tk.Button(ltsh_tanks_frame,
+                                 text="➕ Add Initial Tank",
+                                 command=ltsh_add_tank_row)
     ltsh_tank_button.grid(row=1, column=0, columnspan=4, pady=5)
 
 

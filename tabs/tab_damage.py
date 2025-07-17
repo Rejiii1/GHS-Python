@@ -1,7 +1,11 @@
+"""Damage Stability Tab for Ship Stability Application
+This module creates the Damage tab in the main application notebook.
+"""
 import tkinter as tk
 from tkinter import ttk
 
 def create_damage_tab(notebook):
+    """Creates the Damage Stability tab in the main GUI."""
     tab_damage = tk.Frame(notebook)
     notebook.add(tab_damage, text="Damage Stability")
 
@@ -9,9 +13,11 @@ def create_damage_tab(notebook):
     general_frame = tk.Frame(tab_damage)
     general_frame.pack(pady=10)
 
-    ttk.Label(general_frame, text="Compartment Standard:", font=("Arial", 10)).grid(row=0, column=0, padx=(10, 5), pady=5, sticky="e")
+    ttk.Label(general_frame, text="Compartment Standard:",
+              font=("Arial", 10)).grid(row=0, column=0, padx=(10, 5), pady=5, sticky="e")
     compartment_standard_var = tk.StringVar(value="1")
-    compartment_dropdown = ttk.Combobox(general_frame, textvariable=compartment_standard_var, values=["1", "2"], state="readonly", width=5)
+    compartment_dropdown = ttk.Combobox(general_frame, textvariable=compartment_standard_var,
+                                        values=["1", "2"], state="readonly", width=5)
     compartment_dropdown.grid(row=0, column=1, padx=(0, 20), pady=5, sticky="w")
 
     oldt_var = tk.BooleanVar(value=False)
@@ -19,7 +25,8 @@ def create_damage_tab(notebook):
     oldt_check.grid(row=0, column=2, padx=(10, 5), pady=5, sticky="w")
 
     # === Subdivisions Section Header ===
-    ttk.Label(tab_damage, text="Floodable Subdivisions", font=("Arial", 11, "bold")).pack(pady=(15, 5))
+    ttk.Label(tab_damage, text="Floodable Subdivisions",
+              font=("Arial", 11, "bold")).pack(pady=(15, 5))
 
     subdivisions_container = tk.Frame(tab_damage)
     subdivisions_container.pack()
@@ -29,7 +36,9 @@ def create_damage_tab(notebook):
     header_frame.grid(row=0, column=0, columnspan=4)
     headers = ["#", "Compartment Name", "Permeability", ""]
     for col, text in enumerate(headers):
-        ttk.Label(header_frame, text=text, font=("Arial", 10, "bold")).grid(row=0, column=col, padx=10, pady=(0, 5), sticky="w")
+        ttk.Label(header_frame, text=text,
+                  font=("Arial", 10, "bold")).grid(row=0, column=col,
+                                                   padx=10, pady=(0, 5), sticky="w")
 
     subdivisions_frame = tk.Frame(subdivisions_container)
     subdivisions_frame.grid(row=1, column=0, columnspan=4)
@@ -81,7 +90,10 @@ def create_damage_tab(notebook):
             row["label"].config(text=str(i))
 
     # Add button at bottom
-    add_button = tk.Button(subdivisions_container, text="➕ Add Floodable Subdivision", command=add_subdivision_row, bg="#f0f0f0")
+    add_button = tk.Button(subdivisions_container,
+                           text="➕ Add Floodable Subdivision",
+                           command=add_subdivision_row,
+                           bg="#f0f0f0")
     reposition_add_button()
 
     return {

@@ -1,7 +1,10 @@
-# This file is part of the GHS Stability Generator project.
+"""This module contains functions to generate various blocks of text
+for a ship stability analysis based on user input from a GUI.
+"""
 import os
 
 def resolve_output_directory(custom_path: str) -> str:
+    """Resolves the output directory for generated files."""
     if custom_path:
         output_dir = custom_path
     else:
@@ -13,8 +16,8 @@ def resolve_output_directory(custom_path: str) -> str:
 
 
 #Initial Weights Block Generator
-# It generates the initial weights block based on user input from the GUI.
 def generate_initial_weights_block(initial_weights):
+    """Generates the initial weights at the time of survey into run file"""
     block = ""
     grouped = {"LB": [], "LT": []}
 
@@ -47,13 +50,12 @@ def generate_initial_weights_block(initial_weights):
 
 
 # Initial Tanks Block Generator
-# It generates the initial tanks block based on user input from the GUI.
 def generate_initial_tanks_block(initial_tanks):
+    """Generates the initial tanks block inserted into run file"""
     block = ""
 
     for tank in initial_tanks:
         tank_name = tank["name"].get().strip()
-        contents = tank["contents"].get().strip()
         sg = tank["sg"].get().strip()
         load = tank["load"].get().strip()
 
@@ -68,8 +70,8 @@ def generate_initial_tanks_block(initial_tanks):
 
 
 # Additional Weights Block Generator
-# It generates an every time load case weights block based on user input from the GUI.
 def generate_additional_weights_block(add_weights):
+    """Generates the every time weights block inserted into run file"""
     block = ""
     grouped_by_units = {"LB": [], "LT": []}
 
@@ -96,8 +98,8 @@ def generate_additional_weights_block(add_weights):
 
 
 # Macro Tanks Block Generator
-# It generates a macro block for tanks based on load patterns and tank data.
 def generate_macro_tanks_block(load_patterns, load_tanks):
+    """Generates the macro for tanks based on load case and tank data."""
     macro_block = ""
     for stage in ["Departure", "Midway", "Arrival"]:
         info = load_patterns.get(stage, {})
@@ -115,6 +117,7 @@ def generate_macro_tanks_block(load_patterns, load_tanks):
 
 
 def generate_critical_points_block(critical_points):
+    """Generates the critical points from the GUI."""
     crit_block = ""
     for er in critical_points:
         num   = er["num_lbl"].cget("text")
@@ -131,8 +134,8 @@ def generate_critical_points_block(critical_points):
     return crit_block
 
 # Damage Stability Block Generator
-# It generates the damage stability Info based on user input from the GUI.
 def generate_damage_stability_block(damage_widgets):
+    """Generates the damage stability string of compartments"""
     c_value = damage_widgets["compartment_standard_var"].get()
     oldt_value = "set OLDT = Yes" if damage_widgets["oldt_var"].get() else ""
 
@@ -151,8 +154,8 @@ def generate_damage_stability_block(damage_widgets):
 
 
 # Pontoon Replacements Generator
-# It generates replacements for pontoon data based on user input from the GUI.
 def generate_pontoon_replacements(pontoon_tab):
+    """Generates the replacements for pontoon data."""
     pontoon_replacements = {}
     head_lcg_val = ""
     head_tcg_val = ""

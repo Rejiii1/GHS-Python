@@ -1,12 +1,11 @@
-#   GHS Stability Generator
-#   A tool to generate GHS run files for stability analysis
-#   Version: 1.0.1
-#   Updated: 07-14-2025
-#   Created by: Trip Jackson
-
+"""GHS_Stability_Generator
+   A tool to generate GHS run files for stability analysis
+   Version: 1.0.1
+   Updated: 07-16-2025
+   Created by: Trip Jackson
+"""
 import tkinter as tk
 from tkinter import ttk, messagebox
-from datetime import datetime
 import os
 
 
@@ -15,18 +14,32 @@ import os
 from tabs.tab_report import create_report_tab
 from tabs.tab_damage import create_damage_tab
 from tabs.tab_lightship import create_lightship_tab
+#Generators
+ #  Generators
+
+from utils.generators import (
+    resolve_output_directory,           #  Report Tab
+    generate_initial_weights_block,     #  Lightship Tab
+    generate_initial_tanks_block,
+    generate_additional_weights_block,  #  Loads Tab
+    generate_macro_tanks_block,
+    generate_critical_points_block,     #  Intact Stability Tab
+    generate_pontoon_replacements,      #  Pontoon Tab
+    generate_damage_stability_block,    #  Damage Stability Tab
+    )
+#Constants
+from utils.constants import load_patterns
 
 
-
-
-# Function to load a template file from the templates directory
 def load_template_file(filename):
+    """Loads a template file from the templates directory."""
     template_dir = os.path.join(os.path.dirname(__file__), "templates")
     path = os.path.join(template_dir, filename)
-    with open(path, "r") as f:
+    with open(path, "r", encoding="utf-8") as f:
         return f.read()
 
 def generate_document():
+    """Generates the GHS run files based on user input from the GUI."""
     global add_weights
  #Report Tab ================================================
  # Widgets
@@ -37,15 +50,13 @@ def generate_document():
     fwd_draft = report_widgets["fwd_draft_entry"].get().strip()
     mid_draft = report_widgets["mid_draft_entry"].get().strip()
     aft_draft = report_widgets["aft_draft_entry"].get().strip()
- #  Generators
- #  Call generators for Report Tab
-    from utils.generators import (resolve_output_directory)
+
  #  Resolve output directory
     custom_path = report_widgets["file_location_entry"].get().strip()
     output_dir = resolve_output_directory(custom_path)
-    
+
  #Lightship Tab ================================================
- #  Widgets 
+ #  Widgets
         # Preset survey options in case not used
     excel_data = ""
     vert_value = "1"
@@ -65,12 +76,7 @@ def generate_document():
         ltsh_tcg = lightship_widgets["ltsh_tcg_entry"].get().strip()
         ltsh_vcg = lightship_widgets["ltsh_vcg_entry"].get().strip()
     unit_value = f"UNITS {lightship_widgets["unit_var"].get()}" if survey_label == "User Defined Lightship" else ""
- #  Generators
- #  Call generators for Lightship Tab
-    from utils.generators import (
-        generate_initial_weights_block, 
-        generate_initial_tanks_block
-    )
+
  # Prepare Initial Weights Block
      # Safe defaults in case there are no initial weights
     initial_wt_lcg = ""
@@ -88,13 +94,7 @@ def generate_document():
     paxlcg = pax_lcg_entry.get().strip()
     paxtcg = pax_tcg_entry.get().strip()
     paxvcg = pax_vcg_entry.get().strip()
- #  Generators
- #  Call generators for Loads Tab
-    from utils.constants import load_patterns
-    from utils.generators import (
-            generate_additional_weights_block,
-            generate_macro_tanks_block,
-        )
+
  #  Additional Weights Block
     addstuff_block = generate_additional_weights_block(add_weights)
  #  Macro Tanks Sections
@@ -106,7 +106,7 @@ def generate_document():
         if t["name_widget"].get().strip()
     ]
     fsm_tanks = " ".join(fsm_tanks_list)
- #  FSM for Manual Tank Entry 
+ #  FSM for Manual Tank Entry
     if not tank_model_var.get():
         notanksfs = fs_entry.get().strip()
     else:
@@ -128,12 +128,7 @@ def generate_document():
     else:
         wind_area = "0"
         wind_arm  = "0"
- #  Generators
- #  Call the Generators for Intact Stability Tab
-    from utils.generators import (
-        generate_critical_points_block,
-        generate_pontoon_replacements
-    )
+
  # Critical Points Block
     crit_block = generate_critical_points_block(critical_points)
 
@@ -143,17 +138,15 @@ def generate_document():
  #  Widgets - not yet widgets
  #  None
  #  Generators
- #  Call the Generators for Damage Stability Tab
-    from utils.generators import (generate_damage_stability_block)
- #  Damage stability logic 
+
+ #  Damage stability logic
     c_value, oldt_value, dcconditions_block = generate_damage_stability_block(damage_widgets)
 
  #Pontoon Tab ==============================================================
  #  Widgets - not yet widgets
  #  None
  #  Generators
- # Call the Generators for Pontoon Stability Tab
-    from utils.generators import (generate_pontoon_replacements)
+
  # PONTOON-SPECIFIC DATA EXTRACTION (DO THIS ONCE, BEFORE THE TEMPLATE LOOP)
     pontoon_replacements = generate_pontoon_replacements(pontoon_tab)
 
@@ -161,7 +154,8 @@ def generate_document():
 
  #fill in these fields error message
     if not hull or not route_value or not vessel_value or not survey_value:
-        messagebox.showwarning("Missing info", "Please fill in all fields and select valid options.")
+        messagebox.showwarning("Missing info",
+                               "Please fill in all fields and select valid options.")
         return
 
 
@@ -232,7 +226,7 @@ def generate_document():
                 filled_text = filled_text.replace(placeholder, value)
 
         output_path = os.path.join(output_dir, output_file)
-        with open(output_path, "w") as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             f.write(filled_text)
 
     messagebox.showinfo("Success", f"All files saved in:\n{output_dir}")
@@ -295,7 +289,8 @@ pax_vcg_entry.grid(row=1, column=2, padx=10)
 
 
 # === ADDITIONAL WEIGHTS SECTION ===
-tk.Label(tab_loads, text="Additional Weights in Every Loadcase:", font=("Arial", 10, "bold")).pack(pady=(20, 5))
+tk.Label(tab_loads, text="Additional Weights in Every Loadcase:",
+         font=("Arial", 10, "bold")).pack(pady=(20, 5))
 
 add_weights_frame = tk.Frame(tab_loads)
 add_weights_frame.pack()
@@ -303,17 +298,20 @@ add_weights_frame.pack()
 add_header_created = False
 
 def reposition_add_load_button():
+    """Repositions the 'Add Weight' button based on the number of weights."""
     row_idx = len(add_weights) + 1
     add_load_button.grid_forget()
     add_load_button.grid(row=row_idx, column=0, columnspan=6, pady=5)
 
 def add_load_row():
+    """Adds a new row for additional weights."""
     global add_header_created
 
     if not add_header_created:
         headers = ["Item Name", "Weight", "Units", "LCG", "TCG", "VCG"]
         for col, label in enumerate(headers):
-            tk.Label(add_weights_frame, text=label, font=("Arial", 10, "bold")).grid(row=0, column=col, padx=4, pady=2)
+            tk.Label(add_weights_frame, text=label,
+                     font=("Arial", 10, "bold")).grid(row=0, column=col, padx=4, pady=2)
         add_header_created = True
 
     row_idx = len(add_weights) + 1
@@ -361,14 +359,18 @@ load_tanks = []
 fsm_tanks_list = []
 
 def reposition_load_tank_button():
+    """Repositions the 'Add Tank' button based on the number of tanks."""
     idx = len(load_tanks) + 1
     load_tank_button.grid_forget()
     load_tank_button.grid(row=idx, column=0, columnspan=2, pady=5)
 
 def load_add_tank_row():
+    """Adds a new tank row to the Loads tab."""
     if len(load_tanks) == 0:
-        tk.Label(load_tanks_frame, text="Name",    font=("Arial",10,"bold")).grid(row=0, column=0, padx=5)
-        tk.Label(load_tanks_frame, text="Contents",font=("Arial",10,"bold")).grid(row=0, column=1, padx=5)
+        tk.Label(load_tanks_frame, text="Name",
+                 font=("Arial",10,"bold")).grid(row=0, column=0, padx=5)
+        tk.Label(load_tanks_frame, text="Contents",
+                 font=("Arial",10,"bold")).grid(row=0, column=1, padx=5)
 
     row = len(load_tanks) + 1
     name_ent = tk.Entry(load_tanks_frame, width=15)
@@ -458,6 +460,7 @@ vessel_dropdown.pack()
 
 
 def build_pontoon_content(tab):
+    """Builds the content for the Pontoon tab."""
     # 1) Passenger Crowding title
     tk.Label(tab, text="Passenger Crowding", font=("Arial", 12, "bold")) \
       .pack(pady=(10,5))
@@ -489,8 +492,10 @@ def build_pontoon_content(tab):
         for r, (name, (h_code, v_code)) in enumerate(load_cases, start=2):
             tk.Label(crowd_frame, text=name) \
               .grid(row=r, column=0, padx=5)
-            e_lcg = tk.Entry(crowd_frame, width=8);  e_lcg.grid(row=r, column=1)
-            e_tcg = tk.Entry(crowd_frame, width=8);  e_tcg.grid(row=r, column=2)
+            e_lcg = tk.Entry(crowd_frame, width=8)
+            e_lcg.grid(row=r, column=1)
+            e_tcg = tk.Entry(crowd_frame, width=8)
+            e_tcg.grid(row=r, column=2)
             b_head = tk.BooleanVar(value=False)
             tk.Checkbutton(crowd_frame, variable=b_head) \
               .grid(row=r, column=3)
@@ -511,7 +516,8 @@ def build_pontoon_content(tab):
     # 3) Head Location
     tk.Label(tab, text="Head Location", font=("Arial", 12, "bold")) \
       .pack(pady=(15,5))
-    hl_frame = tk.Frame(tab); hl_frame.pack(pady=5)
+    hl_frame = tk.Frame(tab)
+    hl_frame.pack(pady=5)
     tk.Label(hl_frame, text="LCG").grid(row=0, column=0, padx=10)
     tk.Label(hl_frame, text="TCG").grid(row=0, column=1, padx=10)
     tab.headlcg_entry = tk.Entry(hl_frame, width=10)
@@ -569,7 +575,9 @@ route_label_to_value = {
     "Exposed Waters": "EXPOSED"
 }
 tk.Label(tab_stab, text="Route:").pack(pady=(10, 0))
-ttk.Combobox(tab_stab, textvariable=route_var, values=list(route_label_to_value.keys()), state="readonly").pack()
+ttk.Combobox(tab_stab, textvariable=route_var,
+             values=list(route_label_to_value.keys()),
+             state="readonly").pack()
 
 # === CRITICAL POINTS ===
 tk.Label(tab_stab, text="Critical Points:", font=("Arial",10,"bold")).pack(pady=(20,5))
@@ -582,11 +590,13 @@ crit_header_created = False
 critical_points = []
 
 def reposition_crit_button():
+    """Reposition the critical points button based on current entries."""
     idx = len(critical_points) + 1
     crit_button.grid_forget()
     crit_button.grid(row=idx, column=0, columnspan=5, pady=5)
 
 def add_crit_row():
+    """Add a new row for critical points."""
     global crit_header_created
 
     if not crit_header_created:
@@ -661,12 +671,13 @@ wind_area_entry = tk.Entry(profile_frame, width=12)
 wind_area_entry.grid(row=1, column=0, padx=10)
 
 # Distance between Above/Below WL Centroids
-tk.Label(profile_frame, text="Distance between Above to Below WL Centroids:").grid(row=0, column=1, padx=10)
+tk.Label(profile_frame,
+         text="Distance between Above to Below WL Centroids:").grid(row=0, column=1, padx=10)
 wind_arm_entry = tk.Entry(profile_frame, width=12)
 wind_arm_entry.grid(row=1, column=1, padx=10)
 
 def toggle_profile_fields():
-    """Show the two fields only when checkbox is UN‐checked."""
+    """Show the two fields only when checkbox is UN-checked."""
     if not profile_var.get():
         profile_frame.pack(pady=(10,0))
     else:
@@ -678,13 +689,10 @@ toggle_profile_fields()
 # === TAB 5: Damage Stability ===
 damage_widgets = create_damage_tab(notebook)
 
-
-
 # === Bottom Button ===
 bottom_frame = tk.Frame(root)
 bottom_frame.pack(side="bottom", fill="x")
 tk.Button(bottom_frame, text="Generate Run Files", command=generate_document).pack(pady=10)
-
 
 # Start GUI
 root.mainloop()
