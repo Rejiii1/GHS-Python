@@ -1,6 +1,6 @@
 CLEAR
 echo OFF
-READ asd
+READ 123
 run macro.lib /call
 
 `----------SET VARIABLES----------

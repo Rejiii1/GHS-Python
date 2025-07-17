@@ -17,66 +17,66 @@
 `AFT    = 2
 
 `LCG(Port/Stbd)(Fwd/Aft)(2/5)
-set LCG105   =		`Port 5sqft LCG(ft)
-set TCG105   =		`           TCG(ft)
-set LCG205   =		`Stbd 5sqft LCG(ft)
-set TCG205   =		`           TCG(ft)
-set LCG015   =		`Fwd 5sqft  LCG(ft)
-set TCG015   =	 	`	    	   TCG(ft)
-set LCG025   =		`Aft 5sqft  LCG(ft)
-set TCG025   =		`	    	   TCG(ft)
+set LCG105   =	{{lcg105}}	`Port 5sqft LCG(ft)
+set TCG105   =	{{tcg105}}	`           TCG(ft)
+set LCG205   =	{{lcg205}}	`Stbd 5sqft LCG(ft)
+set TCG205   =	{{tcg205}}	`           TCG(ft)
+set LCG015   =	{{lcg015}}	`Fwd 5sqft  LCG(ft)
+set TCG015   =	{{tcg015}} 	`	    	   TCG(ft)
+set LCG025   =	{{lcg025}}	`Aft 5sqft  LCG(ft)
+set TCG025   =	{{tcg025}}	`	    	   TCG(ft)
 						
-set LCG115  =		`Fwd Port 5sqft LCG
-set TCG115  =		`			  TCG
-set LCG215  =		`Fwd Stbd 5sqft LCG
-set TCG215  =		`			  TCG
-set LCG125  =		`Aft Port 5sqft LCG
-set TCG125  =		`	        	  TCG
-set LCG225  =		`Aft Stbd 5sqft LCG
-set TCG225  =		`		      TCG
+set LCG115  =	{{lcg115}}	`Fwd Port 5sqft LCG
+set TCG115  =	{{tcg115}}	`			  TCG
+set LCG215  =	{{lcg215}}	`Fwd Stbd 5sqft LCG
+set TCG215  =	{{tcg215}}	`			  TCG
+set LCG125  =	{{lcg125}}	`Aft Port 5sqft LCG
+set TCG125  =	{{tcg125}}	`	        	  TCG
+set LCG225  =	{{lcg225}}	`Aft Stbd 5sqft LCG
+set TCG225  =	{{tcg225}}	`		      TCG
 						
-set LCG102	=		`Port 2sqft LCG(ft) 
-set TCG102	=		`           TCG(ft) 
-set LCG202	=		`Stbd 2sqft LCG(ft)
-set LCG012  =	asd	`Fwd 2sqft  LCG(ft)
-set TCG012  =		`	       TCG(ft)
-set LCG022  =		`Aft 2sqft  LCG(ft)
-set TCG022  =		`	    	   TCG(ft)
+set LCG102	=	{{lcg102}}	`Port 2sqft LCG(ft) 
+set TCG102	=	{{tcg102}}	`           TCG(ft) 
+set LCG202	=	{{lcg202}}	`Stbd 2sqft LCG(ft)
+set LCG012  =	{{lcg012}}	`Fwd 2sqft  LCG(ft)
+set TCG012  =	{{tcg012}}	`	       TCG(ft)
+set LCG022  =	{{lcg022}}	`Aft 2sqft  LCG(ft)
+set TCG022  =	{{tcg022}}	`	    	   TCG(ft)
 						 
-set LCG112  =		`Fwd Port 2sqft LCG
-set TCG112  =		`	           TCG
-set LCG212  =		`Fwd Stbd 2sqft LCG
-set TCG212  =		`			   TCG
-set LCG122  =		`Aft Port 2sqft LCG
-set TCG122  =	asd	`	           TCG
-set LCG222  =		`Aft Stbd 2sqft LCG
-set TCG222  =		`		       TCG
+set LCG112  =	{{lcg112}}	`Fwd Port 2sqft LCG
+set TCG112  =	{{tcg112}}	`	           TCG
+set LCG212  =	{{lcg212}}	`Fwd Stbd 2sqft LCG
+set TCG212  =	{{tcg212}}	`			   TCG
+set LCG122  =	{{lcg122}}	`Aft Port 2sqft LCG
+set TCG122  =	{{tcg122}}	`	           TCG
+set LCG222  =	{{lcg222}}	`Aft Stbd 2sqft LCG
+set TCG222  =	{{tcg222}}	`		       TCG
 	`-----HEAD LOCATION-----
-set HEADLCG =	asd		`Head LCG
-set HEADTCG =	asd		`Head TCG
+set HEADLCG =			`Head LCG
+set HEADTCG =			`Head TCG
 set HEADNUM = 1		`Pax in head
 SET HEADWT = {HEADNUM} times {PAXWT}
 SET HMAXPAX  = {PAXCT} minus {HEADNUM}
 SET HMAXPW = {HMAXPAX} times {PAXWT}
 	`-----Head Applicability
 `HEAD{PORTSTBD}{FWDAFT}{PAXSQFT} Set to 0 for not applicable or 1 for applicable
-set HEAD105  = 0		`Port Mid 5
-set HEAD205  = 0		`Stbd Mid 5
-set HEAD015  = 0		`Cent Fwd 5
-set HEAD025  = 1		`Cent Aft 5
-set HEAD115  = 1		`Port Fwd 5
-set HEAD215  = 0		`Stbd Fwd 5
-set HEAD125  = 0		`Port Aft 5
-set HEAD225  = 0		`Stbd Aft 5
+set HEAD105  = {{head105}}		`Port Mid 5
+set HEAD205  = {{head205}}		`Stbd Mid 5
+set HEAD015  = {{head015}}		`Cent Fwd 5
+set HEAD025  = {{head025}}		`Cent Aft 5
+set HEAD115  = {{head115}}		`Port Fwd 5
+set HEAD215  = {{head215}}		`Stbd Fwd 5
+set HEAD125  = {{head125}}		`Port Aft 5
+set HEAD225  = {{head225}}		`Stbd Aft 5
 
-set HEAD102  = 1		`Port Mid 2
-set HEAD202  = 1		`Stbd Mid 2
-set HEAD012  = 0		`Cent Fwd 2
-set HEAD022  = 0	`Cent Aft 2
-set HEAD112  = 0	`Port Fwd 2
-set HEAD212  = 0	`Stbd Fwd 2
-set HEAD122  = 0	`Port Aft 2
-set HEAD222  = 1	`Stbd Aft 2
+set HEAD102  = {{head102}}		`Port Mid 2
+set HEAD202  = {{head202}}		`Stbd Mid 2
+set HEAD012  = {{head012}}		`Cent Fwd 2
+set HEAD022  = {{head022}}	`Cent Aft 2
+set HEAD112  = {{head112}}	`Port Fwd 2
+set HEAD212  = {{head212}}	`Stbd Fwd 2
+set HEAD122  = {{head122}}	`Port Aft 2
+set HEAD222  = {{head222}}	`Stbd Aft 2
 
 `---------Cycle of pontoon loads
 MACRO TANKCONDIT	`Cycles through the three tank loads

@@ -140,6 +140,7 @@ def generate_damage_stability_block(damage_widgets):
     oldt_value = "set OLDT = Yes" if damage_widgets["oldt_var"].get() else ""
 
     dcconditions_block = ""
+    macroperm_block = ""
     for i, row in enumerate(damage_widgets["subdivisions"], start=1):
         comp_name = row["entry"].get().strip()
         perm = row["perm_entry"].get().strip()
@@ -147,10 +148,10 @@ def generate_damage_stability_block(damage_widgets):
             dcconditions_block += (
                 f"variable(string) DC{i}\n"
                 f'SET DC{i} = "{comp_name}"\n'
-                f'PERM ("{comp_name}") "{perm}"\n\n'
             )
+            macroperm_block += f'PERM ("{comp_name}") "{perm}"\n'
 
-    return c_value, oldt_value, dcconditions_block
+    return c_value, oldt_value, dcconditions_block, macroperm_block
 
 
 # Pontoon Replacements Generator

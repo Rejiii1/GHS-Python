@@ -140,7 +140,8 @@ def generate_document():
  #  Generators
 
  #  Damage stability logic
-    c_value, oldt_value, dcconditions_block = generate_damage_stability_block(damage_widgets)
+    c_value, oldt_value, dcconditions_block, macroperm_block = generate_damage_stability_block(
+        damage_widgets)
 
  #Pontoon Tab ==============================================================
  #  Widgets - not yet widgets
@@ -218,6 +219,7 @@ def generate_document():
             .replace("{{c}}", c_value)
             .replace("{{oldt}}", oldt_value)
             .replace("{{dcconditions}}", dcconditions_block.strip())
+            .replace("{{macroperm}}", macroperm_block.strip())
         )
 
        # Apply pontoon-specific replacements IF this is the pontoon template
