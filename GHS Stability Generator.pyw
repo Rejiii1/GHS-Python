@@ -41,7 +41,7 @@ def load_template_file(filename):
 def generate_document():
     """Generates the GHS run files based on user input from the GUI."""
     global add_weights
- #Report Tab ================================================
+ #Report Tab =======================================================================================
  # Widgets
     hull = report_widgets["name_entry"].get().strip()
     sg_value = report_widgets["sg_label_to_value"].get(report_widgets["sg_var"].get(), "")
@@ -55,7 +55,7 @@ def generate_document():
     custom_path = report_widgets["file_location_entry"].get().strip()
     output_dir = resolve_output_directory(custom_path)
 
- #Lightship Tab ================================================
+ #Lightship Tab ====================================================================================
  #  Widgets
         # Preset survey options in case not used
     excel_data = ""
@@ -85,8 +85,7 @@ def generate_document():
     initial_weights_block = generate_initial_weights_block(lightship_widgets["initial_weights"])
  # Prepare Initial Tanks Block
     initial_tanks_block = generate_initial_tanks_block(lightship_widgets["initial_tanks"])
-
- #Loads Tab ==============================================================
+ #Loads Tab ========================================================================================
  #  Widgets - not yet widgets
     # === PASSENGER INFO ===
     paxct = pax_count_entry.get().strip()
@@ -113,7 +112,7 @@ def generate_document():
         notanksfs = "0"
 
 
- #Intact Stability Tab =======================================================
+ #Intact Stability Tab =============================================================================
  #  Widgets - Not yet widgets
     selected_label = route_var.get().strip()
     route_value = route_label_to_value.get(selected_label, "")
@@ -128,26 +127,16 @@ def generate_document():
     else:
         wind_area = "0"
         wind_arm  = "0"
-
  # Critical Points Block
     crit_block = generate_critical_points_block(critical_points)
 
 
 
- #Damage Stability Tab =====================================================
- #  Widgets - not yet widgets
- #  None
- #  Generators
-
+ #Damage Stability Tab =============================================================================
  #  Damage stability logic
     c_value, oldt_value, dcconditions_block, macroperm_block = generate_damage_stability_block(
         damage_widgets)
-
- #Pontoon Tab ==============================================================
- #  Widgets - not yet widgets
- #  None
- #  Generators
-
+ #Pontoon Tab ======================================================================================
  # PONTOON-SPECIFIC DATA EXTRACTION (DO THIS ONCE, BEFORE THE TEMPLATE LOOP)
     pontoon_replacements = generate_pontoon_replacements(pontoon_tab)
 
@@ -533,6 +522,7 @@ def build_pontoon_content(tab):
 pontoon_tab = None
 
 def update_pontoon_tab(*args):
+    """Updates the Pontoon tab based on the selected vessel type."""
     global pontoon_tab
     if vessel_var.get() == "Pontoon Boat" and pontoon_tab is None:
         pontoon_tab = tk.Frame(notebook)

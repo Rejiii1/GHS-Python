@@ -1,7 +1,11 @@
+"""Report Details Tab for Ship Stability Application
+This module creates the Report tab in the main application notebook.
+"""
 import tkinter as tk
 from tkinter import ttk
 
 def create_report_tab(notebook):
+    """Creates the Report Details tab in the main GUI."""
     tab_report = tk.Frame(notebook)
     notebook.add(tab_report, text="Report Details")
 
@@ -50,7 +54,8 @@ def create_report_tab(notebook):
     widgets["length_label_to_value"] = length_label_to_value
 
     length_dropdown = ttk.Combobox(units_frame, textvariable=widgets["length_var"],
-                                   values=list(length_label_to_value.keys()), state="readonly", width=10)
+                                   values=list(length_label_to_value.keys()),
+                                   state="readonly", width=10)
     length_dropdown.grid(row=1, column=0, padx=10)
 
     # Weight
@@ -63,7 +68,8 @@ def create_report_tab(notebook):
     widgets["weight_label_to_value"] = weight_label_to_value
 
     weight_dropdown = ttk.Combobox(units_frame, textvariable=widgets["weight_var"],
-                                   values=list(weight_label_to_value.keys()), state="readonly", width=10)
+                                   values=list(weight_label_to_value.keys()),
+                                   state="readonly", width=10)
     weight_dropdown.grid(row=1, column=1, padx=10)
 
     # === Draft Locations ===
