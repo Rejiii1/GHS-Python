@@ -76,7 +76,7 @@ def generate_document():
         ltsh_lcg = lightship_widgets["ltsh_lcg_entry"].get().strip()
         ltsh_tcg = lightship_widgets["ltsh_tcg_entry"].get().strip()
         ltsh_vcg = lightship_widgets["ltsh_vcg_entry"].get().strip()
-    unit_value = f"UNITS {lightship_widgets["unit_var"].get()}" if survey_label == "User Defined Lightship" else ""
+    unit_value = f'UNITS {lightship_widgets["unit_var"].get()}' if survey_label == "User Defined Lightship" else ""
 
  # Prepare Initial Weights Block
      # Safe defaults in case there are no initial weights
