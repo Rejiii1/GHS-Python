@@ -20,8 +20,9 @@ Organized into task-specific tabs:
   - **Departure**, **Midway**, and **Arrival** stages
   - Auto-loads based on tank contents (`Gasoline`, `Diesel`, `Water`, etc.)
 - 🧭 **Intact Stability** – Select vessel type and operating route.
-- 🧍‍♂️ **Passenger Weights** – Input count, weight, and CGs for passengers.
-- ➕ **Additional Weights** – Define other load items for inclusion in the run file.
+  - 🧍‍♂️ **Passenger Weights** – Input count, weight, and CGs for passengers.
+  - ➕ **Additional Weights** – Define other load items for inclusion in the run file.
+` 🌊 **Damage Stability** - Add Compartment names and permiabilities to run damage load cases
 
 ### 📐 Pontoon Crowding 
 - Cowding info via dedicated crowding tables for 2 sqft and 5 sqft configurations.
@@ -34,9 +35,6 @@ Organized into task-specific tabs:
 - Automatically substitutes placeholders (e.g., `{{hull}}`, `{{fsm_tanks}}`, `{{lcg105}}`) with GUI data.
 - Outputs GHS-formatted `.rf` and `.lib` files into the `generated/` directory.
 
----
-
-## Next up Damage Stability
 
 ---
 
