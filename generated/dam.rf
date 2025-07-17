@@ -3,32 +3,22 @@ CLEAR
 RUN INT.RF /CALL /QUIET
 .CRITICAL
 `=== Compartment Standard 1 or 2 ===============================
- set C = 2
+ set C = 1
 `=== OLD T for "Existing Vessels" (1996) =======================
- set OLDT = Yes`set OLDT = Yes
+ `set OLDT = Yes
 `===============================================================
 `DEFINE FLOODABLE SUBDIVISIONS TO CONSIDER
 `SHOULD DAMAGE TO THE SIDE OF LIST/TCG
 variable(string) DC0
 SET DC0 = "" 
-variable(string) DC1
-SET DC1 = "111"
-variable(string) DC2
-SET DC2 = "222"
-variable(string) DC3
-SET DC3 = "333"
-variable(string) DC4
-SET DC4 = "444"
+
 
 `=== Change any permiability ====================================
 MACRO PERM				
 PERM (*) 0.95				`SETS ALL SPACES TO .95 
 `PERM (ENGRM*) 0.85			`SETS ER TO .85 **CHECK COMPT NAME IN GF
 `PERM (GEN-ROOM*) 0.85
-PERM ("111") "0.95"
-PERM ("222") "0.95"
-PERM ("333") "0.95"
-PERM ("444") "4444"
+
 `permiability IS BROKEN! FIX GUI TO MAKE THE MACRO PERM
 /
 `===============================================================
