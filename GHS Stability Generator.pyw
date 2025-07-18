@@ -236,10 +236,8 @@ notebook.pack(fill="both", expand=True)
 
 # === TAB 1: Report Details ===
 report_widgets = create_report_tab(notebook)
-
 # === TAB 2: Lightship ===
 lightship_frame, lightship_widgets = create_lightship_tab(notebook)
-
 # === TAB 3: Loads ===
 loads_tab, loads_widgets = create_loads_tab(notebook)
 # === TAB 4: Intact Stability ===
@@ -257,7 +255,6 @@ route_label_to_value = {
     "Partially Protected Waters": "PARTIAL",
     "Exposed Waters": "EXPOSED"
 }
-
 intact_widgets = create_intact_tab(
     notebook, vessel_var, vessel_label_to_value, route_var, route_label_to_value
 )
@@ -268,24 +265,16 @@ pontoon_widgets = None  # To hold crowd/head entries if you want later
 def update_pontoon_tab(*args):
     """Updates the Pontoon tab based on the selected vessel type."""
     global pontoon_tab, pontoon_widgets
-
     if vessel_var.get() == "Pontoon Boat" and pontoon_tab is None:
         pontoon_tab, pontoon_widgets = build_pontoon_tab(notebook)
-
     elif vessel_var.get() != "Pontoon Boat" and pontoon_tab is not None:
         notebook.forget(pontoon_tab)
         pontoon_tab = None
         pontoon_widgets = None
-
-
 # Hook the trace *after* creating the combobox
 vessel_var.trace_add("write", update_pontoon_tab)
 # Call once in case default is already "Pontoon Boat"
 update_pontoon_tab()
-
-
-
-
 
 # === TAB 5: Damage Stability ===
 damage_widgets = create_damage_tab(notebook)

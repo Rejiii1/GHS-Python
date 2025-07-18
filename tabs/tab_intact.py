@@ -4,6 +4,8 @@ This module creates the Intact tab in the main application notebook.
 import tkinter as tk
 from tkinter import ttk
 
+
+
 def create_intact_tab(notebook, vessel_var, vessel_label_to_value, route_var, route_label_to_value):
     """Builds the Intact Stability tab UI and returns all related widgets/variables."""
     tab_stab = tk.Frame(notebook)
