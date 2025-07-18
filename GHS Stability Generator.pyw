@@ -17,22 +17,18 @@ from tabs.tab_loads import create_loads_tab
 from tabs.tab_intact import create_intact_tab
 from tabs.tab_pontoon import build_pontoon_tab
 from tabs.tab_damage import create_damage_tab
-#Generators
- #  Generators
 
-from utils.generators import (
-    resolve_output_directory,           #  Report Tab
-    generate_initial_weights_block,     #  Lightship Tab
-    generate_initial_tanks_block,
-    generate_additional_weights_block,  #  Loads Tab
-    generate_macro_tanks_block,
-    generate_critical_points_block,     #  Intact Stability Tab
-    generate_pontoon_replacements,      #  Pontoon Tab
-    generate_damage_stability_block,    #  Damage Stability Tab
-    )
-#Constants
-from utils.constants import load_patterns
+from utils.generators import resolve_output_directory
 
+# Input Collector
+from utils.input_collector import (
+    collect_report_data,
+    collect_lightship_data,
+    collect_loads_data,
+    collect_intact_data,
+    collect_damage_data,
+    collect_pontoon_data
+)
 
 def load_template_file(filename):
     """Loads a template file from the templates directory."""
@@ -42,116 +38,24 @@ def load_template_file(filename):
         return f.read()
 
 def generate_document():
-    """Generates the GHS run files based on user input from the GUI."""
-    global add_weights
- #Report Tab =======================================================================================
- # Widgets
-    hull = report_widgets["name_entry"].get().strip()
-    sg_value = report_widgets["sg_label_to_value"].get(report_widgets["sg_var"].get(), "")
-    unit_length = report_widgets["length_label_to_value"].get(report_widgets["length_var"].get(), "")
-    unit_weight = report_widgets["weight_label_to_value"].get(report_widgets["weight_var"].get(), "")
-    fwd_draft = report_widgets["fwd_draft_entry"].get().strip()
-    mid_draft = report_widgets["mid_draft_entry"].get().strip()
-    aft_draft = report_widgets["aft_draft_entry"].get().strip()
+    """Collects data from all tabs and generates GHS run files."""
+    report_data = collect_report_data(report_widgets)
+    lightship_data = collect_lightship_data(lightship_widgets)
+    loads_data = collect_loads_data(loads_widgets)
+    intact_data = collect_intact_data(
+        intact_widgets,
+        route_var,
+        route_label_to_value,
+        vessel_var,
+        vessel_label_to_value
+    )
+    damage_data = collect_damage_data(damage_widgets)
+    pontoon_replacements = collect_pontoon_data(pontoon_widgets)
 
- #  Resolve output directory
-    custom_path = report_widgets["file_location_entry"].get().strip()
-    output_dir = resolve_output_directory(custom_path)
+    # Resolve output directory
+    output_dir = resolve_output_directory(report_data["custom_path"])
 
- #Lightship Tab ====================================================================================
- #  Widgets
-        # Preset survey options in case not used
-    excel_data = ""
-    vert_value = "1"
-    gmmt_value = "1"
-    disp = ltsh_lcg = ltsh_tcg = ltsh_vcg = ""
-    survey_label = lightship_widgets["survey_var"].get().strip()
-    survey_value = lightship_widgets["survey_label_to_value"].get(survey_label, "")
-    if survey_label in ["Deadweight Survey", "Inclining Experiment"]:
-        excel_data = lightship_widgets["excel_text"].get("1.0", tk.END).strip()
-    if survey_label == "Deadweight Survey":
-        vert_value = lightship_widgets["vert_entry"].get().strip()
-    if survey_label == "Inclining Experiment":
-        gmmt_value = lightship_widgets["gmmt_entry"].get().strip()
-    if survey_label == "User Defined Lightship":
-        disp = lightship_widgets["disp_entry"].get().strip()
-        ltsh_lcg = lightship_widgets["ltsh_lcg_entry"].get().strip()
-        ltsh_tcg = lightship_widgets["ltsh_tcg_entry"].get().strip()
-        ltsh_vcg = lightship_widgets["ltsh_vcg_entry"].get().strip()
-    unit_value = f'UNITS {
-        lightship_widgets["unit_var"].get()}' if survey_label == "User Defined Lightship" else ""
-
- # Prepare Initial Weights Block
-     # Safe defaults in case there are no initial weights
-    initial_wt_lcg = ""
-    initial_wt_tcg = ""
-    initial_wt_vcg = ""
-    initial_weights_block = generate_initial_weights_block(lightship_widgets["initial_weights"])
- # Prepare Initial Tanks Block
-    initial_tanks_block = generate_initial_tanks_block(lightship_widgets["initial_tanks"])
- #Loads Tab ========================================================================================
- #  Widgets - not yet widgets
-    # === PASSENGER INFO ===
-    paxct   = loads_widgets["pax_count_entry"].get().strip()
-    paxwt   = loads_widgets["pax_weight_entry"].get().strip()
-    paxlcg  = loads_widgets["pax_lcg_entry"].get().strip()
-    paxtcg  = loads_widgets["pax_tcg_entry"].get().strip()
-    paxvcg  = loads_widgets["pax_vcg_entry"].get().strip()
-
- #  Additional Weights Block
-    addstuff_block = generate_additional_weights_block(loads_widgets["add_weights"])
- #  Macro Tanks Sections
-    macro_block = generate_macro_tanks_block(load_patterns, loads_widgets["load_tanks"])
- # Create the FSM list of real Tanks
-    fsm_tanks_list = [
-        t["name_widget"].get().strip()
-        for t in loads_widgets["load_tanks"]
-        if t["name_widget"].get().strip()
-    ]
-    fsm_tanks = " ".join(fsm_tanks_list)
- #  FSM for Manual Tank Entry
-    if not loads_widgets["tank_model_var"].get():
-        notanksfs = loads_widgets["fs_entry"].get().strip()
-    else:
-        notanksfs = "0"
-
-
- #Intact Stability Tab =============================================================================
- #  Widgets
-    selected_label = route_var.get().strip()
-    route_value = route_label_to_value.get(selected_label, "")
-    beam = intact_widgets["beam_entry"].get().strip()
-    length = intact_widgets["length_entry"].get().strip()
-    vessel_label = vessel_var.get().strip()
-    vessel_value = vessel_label_to_value.get(vessel_label, "")
- # Wind Area and Arm Manual
-    if not intact_widgets["profile_var"].get():
-        wind_area = intact_widgets["wind_area_entry"].get().strip()
-        wind_arm = intact_widgets["wind_arm_entry"].get().strip()
-    else:
-        wind_area = "0"
-        wind_arm  = "0"
- # Critical Points Block
-    crit_block = generate_critical_points_block(intact_widgets["critical_points"])
-
-
-
- #Damage Stability Tab =============================================================================
- #  Damage stability logic
-    c_value, oldt_value, dcconditions_block, macroperm_block = generate_damage_stability_block(
-        damage_widgets)
- #Pontoon Tab ======================================================================================
- # PONTOON-SPECIFIC DATA EXTRACTION (DO THIS ONCE, BEFORE THE TEMPLATE LOOP)
-    pontoon_replacements = generate_pontoon_replacements(pontoon_widgets)
-
- #fill in these fields error message - tabbed out b/c annoying
- #   if not hull or not survey_value:
- #       messagebox.showwarning("Missing info",
- #                              "Please fill in all fields and select valid options.")
- #       return
-
-
-    # Define your templates and output filenames
+    # Prepare template-to-output mapping
     templates = {
         "ls_temp.txt": "ls.rf",
         "load_temp.txt": "load.rf",
@@ -168,52 +72,50 @@ def generate_document():
             messagebox.showerror("Template Error", f"Template not found: {template_file}")
             continue
 
+        # Replace placeholders in template with collected data
         filled_text = (
             template
-            .replace("{{hull}}", hull)
-            .replace("{{sg}}", sg_value)
-            .replace("{{unit_length}}", unit_length)
-            .replace("{{unit_weight}}", unit_weight)
-            .replace("{{fwddrloc}}", fwd_draft)
-            .replace("{{middrloc}}", mid_draft)
-            .replace("{{aftdrloc}}", aft_draft)
-            .replace("{{route}}", route_value)
-            .replace("{{vessel}}", vessel_value)
-            .replace("{{option}}", survey_value)
-            .replace("{{excel_paste}}", excel_data)
-            .replace("{{vert}}", vert_value)
-            .replace("{{gmmt}}", gmmt_value)
-            .replace("{{disp}}", f"WEIGHT {disp}" if disp else "")
-            .replace("{{user_lightship_units}}", unit_value)
-            .replace("{{ltsh_lcg}}", ltsh_lcg)
-            .replace("{{ltsh_tcg}}", ltsh_tcg)
-            .replace("{{ltsh_vcg}}", ltsh_vcg)
-            .replace("{{initial_wt_lcg}}", initial_wt_lcg)
-            .replace("{{initial_wt_tcg}}", initial_wt_tcg)
-            .replace("{{initial_wt_vcg}}", initial_wt_vcg)
-            .replace("{{initial_weights}}", initial_weights_block.strip())
-            .replace("{{initial_tanks}}", initial_tanks_block.strip())
-            .replace("{{paxct}}", paxct)
-            .replace("{{paxwt}}", paxwt)
-            .replace("{{paxlcg}}", paxlcg)
-            .replace("{{paxtcg}}", paxtcg)
-            .replace("{{paxvcg}}", paxvcg)
-            .replace("{{addstuff}}", addstuff_block.strip())
-            .replace("{{fsm_tanks}}", fsm_tanks)
-            .replace("{{tank_macros}}", macro_block)
-            .replace("{{beam}}", beam)
-            .replace("{{length}}", length)
-            .replace("{{critical_points}}", crit_block.strip())
-            .replace("{{wind_area}}", wind_area)
-            .replace("{{wind_arm}}",  wind_arm)
-            .replace("{{notanksfs}}", notanksfs)
-            .replace("{{c}}", c_value)
-            .replace("{{oldt}}", oldt_value)
-            .replace("{{dcconditions}}", dcconditions_block.strip())
-            .replace("{{macroperm}}", macroperm_block.strip())
+            .replace("{{hull}}", report_data["hull"])
+            .replace("{{sg}}", report_data["sg_value"])
+            .replace("{{unit_length}}", report_data["unit_length"])
+            .replace("{{unit_weight}}", report_data["unit_weight"])
+            .replace("{{fwddrloc}}", report_data["fwd_draft"])
+            .replace("{{middrloc}}", report_data["mid_draft"])
+            .replace("{{aftdrloc}}", report_data["aft_draft"])
+            .replace("{{route}}", intact_data["route_value"])
+            .replace("{{vessel}}", intact_data["vessel_value"])
+            .replace("{{option}}", lightship_data["survey_value"])
+            .replace("{{excel_paste}}", lightship_data["excel_data"])
+            .replace("{{vert}}", lightship_data["vert_value"])
+            .replace("{{gmmt}}", lightship_data["gmmt_value"])
+            .replace("{{disp}}", f"WEIGHT {lightship_data['disp']}" if lightship_data["disp"] else "")
+            .replace("{{user_lightship_units}}", lightship_data["unit_value"])
+            .replace("{{ltsh_lcg}}", lightship_data["ltsh_lcg"])
+            .replace("{{ltsh_tcg}}", lightship_data["ltsh_tcg"])
+            .replace("{{ltsh_vcg}}", lightship_data["ltsh_vcg"])
+            .replace("{{initial_weights}}", lightship_data["initial_weights_block"].strip())
+            .replace("{{initial_tanks}}", lightship_data["initial_tanks_block"].strip())
+            .replace("{{paxct}}", loads_data["paxct"])
+            .replace("{{paxwt}}", loads_data["paxwt"])
+            .replace("{{paxlcg}}", loads_data["paxlcg"])
+            .replace("{{paxtcg}}", loads_data["paxtcg"])
+            .replace("{{paxvcg}}", loads_data["paxvcg"])
+            .replace("{{addstuff}}", loads_data["addstuff_block"].strip())
+            .replace("{{fsm_tanks}}", loads_data["fsm_tanks"])
+            .replace("{{tank_macros}}", loads_data["macro_block"])
+            .replace("{{beam}}", intact_data["beam"])
+            .replace("{{length}}", intact_data["length"])
+            .replace("{{critical_points}}", intact_data["crit_block"].strip())
+            .replace("{{wind_area}}", intact_data["wind_area"])
+            .replace("{{wind_arm}}", intact_data["wind_arm"])
+            .replace("{{notanksfs}}", loads_data["notanksfs"])
+            .replace("{{c}}", damage_data["c_value"])
+            .replace("{{oldt}}", damage_data["oldt_value"])
+            .replace("{{dcconditions}}", damage_data["dcconditions_block"].strip())
+            .replace("{{macroperm}}", damage_data["macroperm_block"].strip())
         )
 
-       # Apply pontoon-specific replacements IF this is the pontoon template
+        # Pontoon-specific replacements
         if template_file == "pontoon_temp.txt":
             for placeholder, value in pontoon_replacements.items():
                 filled_text = filled_text.replace(placeholder, value)
