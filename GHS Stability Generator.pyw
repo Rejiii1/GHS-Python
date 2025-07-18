@@ -12,11 +12,11 @@ import os
 #GUI
 #tabs
 from tabs.tab_report import create_report_tab
-from tabs.tab_damage import create_damage_tab
 from tabs.tab_lightship import create_lightship_tab
 from tabs.tab_loads import create_loads_tab
+from tabs.tab_intact import create_intact_tab
 from tabs.tab_pontoon import build_pontoon_tab
-
+from tabs.tab_damage import create_damage_tab
 #Generators
  #  Generators
 
@@ -78,7 +78,8 @@ def generate_document():
         ltsh_lcg = lightship_widgets["ltsh_lcg_entry"].get().strip()
         ltsh_tcg = lightship_widgets["ltsh_tcg_entry"].get().strip()
         ltsh_vcg = lightship_widgets["ltsh_vcg_entry"].get().strip()
-    unit_value = f'UNITS {lightship_widgets["unit_var"].get()}' if survey_label == "User Defined Lightship" else ""
+    unit_value = f'UNITS {
+        lightship_widgets["unit_var"].get()}' if survey_label == "User Defined Lightship" else ""
 
  # Prepare Initial Weights Block
      # Safe defaults in case there are no initial weights
@@ -116,22 +117,22 @@ def generate_document():
 
 
  #Intact Stability Tab =============================================================================
- #  Widgets - Not yet widgets
+ #  Widgets
     selected_label = route_var.get().strip()
     route_value = route_label_to_value.get(selected_label, "")
-    beam = beam_entry.get().strip()
-    length = length_entry.get().strip()
+    beam = intact_widgets["beam_entry"].get().strip()
+    length = intact_widgets["length_entry"].get().strip()
     vessel_label = vessel_var.get().strip()
     vessel_value = vessel_label_to_value.get(vessel_label, "")
  # Wind Area and Arm Manual
-    if not profile_var.get():
-        wind_area = wind_area_entry.get().strip()
-        wind_arm  = wind_arm_entry.get().strip()
+    if not intact_widgets["profile_var"].get():
+        wind_area = intact_widgets["wind_area_entry"].get().strip()
+        wind_arm = intact_widgets["wind_arm_entry"].get().strip()
     else:
         wind_area = "0"
         wind_arm  = "0"
  # Critical Points Block
-    crit_block = generate_critical_points_block(critical_points)
+    crit_block = generate_critical_points_block(intact_widgets["critical_points"])
 
 
 
@@ -242,9 +243,6 @@ lightship_frame, lightship_widgets = create_lightship_tab(notebook)
 # === TAB 3: Loads ===
 loads_tab, loads_widgets = create_loads_tab(notebook)
 # === TAB 4: Intact Stability ===
-tab_stab = tk.Frame(notebook)
-notebook.add(tab_stab, text="Intact Stability")
-
 vessel_var = tk.StringVar(value="Select a vessel type")
 vessel_label_to_value = {
     "Power Boat": "POWER",
@@ -253,16 +251,16 @@ vessel_label_to_value = {
     "Monohull Sailboat": "MONOSAIL",
     "Catamaran Sailboat": "CATSAIL"
 }
-tk.Label(tab_stab, text="Vessel Type:").pack(pady=(10, 0))
-vessel_dropdown = ttk.Combobox(
-    tab_stab,
-    textvariable=vessel_var,
-    values=list(vessel_label_to_value.keys()),
-    state="readonly"
+route_var = tk.StringVar(value="Select a route")
+route_label_to_value = {
+    "Protected Waters": "PROTECT",
+    "Partially Protected Waters": "PARTIAL",
+    "Exposed Waters": "EXPOSED"
+}
+
+intact_widgets = create_intact_tab(
+    notebook, vessel_var, vessel_label_to_value, route_var, route_label_to_value
 )
-vessel_dropdown.pack()
-
-
 # === TAB 4.5: Pontoon Stability ==
 pontoon_tab = None
 pontoon_widgets = None  # To hold crowd/head entries if you want later
@@ -287,143 +285,7 @@ update_pontoon_tab()
 
 
 
-# === Vessel Dimensions ===
-tk.Label(tab_stab, text="Vessel Dimensions:", font=("Arial",10,"bold")).pack(pady=(20,5))
 
-dim_frame = tk.Frame(tab_stab)
-dim_frame.pack()
-
-# Beam
-tk.Label(dim_frame, text="Beam:").grid(row=0, column=0, padx=10)
-beam_entry = tk.Entry(dim_frame, width=12)
-beam_entry.insert(0, "{WOA}")
-beam_entry.grid(row=1, column=0, padx=10)
-
-# Length
-tk.Label(dim_frame, text="Length:").grid(row=0, column=1, padx=10)
-length_entry = tk.Entry(dim_frame, width=12)
-length_entry.insert(0, "{LOA}")
-length_entry.grid(row=1, column=1, padx=10)
-
-# Route
-
-route_var = tk.StringVar(value="Select a route")
-route_label_to_value = {
-    "Protected Waters": "PROTECT",
-    "Partially Protected Waters": "PARTIAL",
-    "Exposed Waters": "EXPOSED"
-}
-tk.Label(tab_stab, text="Route:").pack(pady=(10, 0))
-ttk.Combobox(tab_stab, textvariable=route_var,
-             values=list(route_label_to_value.keys()),
-             state="readonly").pack()
-
-# === CRITICAL POINTS ===
-tk.Label(tab_stab, text="Critical Points:", font=("Arial",10,"bold")).pack(pady=(20,5))
-
-crit_frame = tk.Frame(tab_stab)
-crit_frame.pack()
-
-# Table header (hidden until first add)
-crit_header_created = False
-critical_points = []
-
-def reposition_crit_button():
-    """Reposition the critical points button based on current entries."""
-    idx = len(critical_points) + 1
-    crit_button.grid_forget()
-    crit_button.grid(row=idx, column=0, columnspan=5, pady=5)
-
-def add_crit_row():
-    """Add a new row for critical points."""
-    global crit_header_created
-
-    if not crit_header_created:
-        headers = ["#", "Name", "Longitudinal", "Transverse", "Vertical", ""]
-        for c, h in enumerate(headers):
-            tk.Label(crit_frame, text=h, font=("Arial",10,"bold")).grid(row=0, column=c, padx=4)
-        crit_header_created = True
-
-    row = len(critical_points) + 1
-
-    # Widgets
-    num_lbl = tk.Label(crit_frame, text=str(row))
-    name_ent = tk.Entry(crit_frame, width=15)
-    long_ent = tk.Entry(crit_frame, width=10)
-    trans_ent= tk.Entry(crit_frame, width=10)
-    vert_ent = tk.Entry(crit_frame, width=10)
-
-    # Layout
-    num_lbl.grid(row=row, column=0, padx=2)
-    name_ent.grid(row=row, column=1, padx=2)
-    long_ent.grid(row=row, column=2, padx=2)
-    trans_ent.grid(row=row, column=3, padx=2)
-    vert_ent.grid(row=row, column=4, padx=2)
-
-    # Delete button
-    def delete_crit():
-        for w in (num_lbl, name_ent, long_ent, trans_ent, vert_ent, del_btn):
-            w.grid_forget()
-        critical_points.remove(entry_row)
-        # renumber remaining rows
-        for i, er in enumerate(critical_points, start=1):
-            er["num_lbl"].config(text=str(i))
-        reposition_crit_button()
-
-    del_btn = tk.Button(crit_frame, text="❌", command=delete_crit, fg="red")
-    del_btn.grid(row=row, column=5, padx=2)
-
-    entry_row = {
-        "num_lbl": num_lbl,
-        "name_ent": name_ent,
-        "long_ent": long_ent,
-        "trans_ent": trans_ent,
-        "vert_ent": vert_ent,
-        "del_btn": del_btn
-    }
-    critical_points.append(entry_row)
-    reposition_crit_button()
-
-crit_button = tk.Button(crit_frame, text="➕ Add Critical Point", command=add_crit_row)
-crit_button.grid(row=1, column=0, columnspan=5, pady=5)
-
-# === PROFILE AREA TOGGLE ===
-# BooleanVar default True (checked)
-tk.Label(tab_stab, text="Wind Profile:", font=("Arial",10,"bold")).pack(pady=(20,0))
-profile_var = tk.BooleanVar(value=True)
-
-# Checkbutton
-chk = tk.Checkbutton(
-    tab_stab,
-    text="Model includes Profile Area:",
-    variable=profile_var,
-    command=lambda: toggle_profile_fields()
-)
-chk.pack(pady=(5, 5))
-
-# Frame to hold the two additional fields (hidden by default)
-profile_frame = tk.Frame(tab_stab)
-
-# Wind Area
-tk.Label(profile_frame, text="Wind Area:").grid(row=0, column=0, padx=10)
-wind_area_entry = tk.Entry(profile_frame, width=12)
-wind_area_entry.grid(row=1, column=0, padx=10)
-
-# Distance between Above/Below WL Centroids
-tk.Label(profile_frame,
-         text="Distance between Above to Below WL Centroids:").grid(row=0, column=1, padx=10)
-wind_arm_entry = tk.Entry(profile_frame, width=12)
-wind_arm_entry.grid(row=1, column=1, padx=10)
-
-def toggle_profile_fields():
-    """Show the two fields only when checkbox is UN-checked."""
-    if not profile_var.get():
-        profile_frame.pack(pady=(10,0))
-    else:
-        profile_frame.forget()
-
-# Ensure correct initial state
-toggle_profile_fields()
 
 # === TAB 5: Damage Stability ===
 damage_widgets = create_damage_tab(notebook)

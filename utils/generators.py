@@ -180,4 +180,3 @@ def generate_pontoon_replacements(pontoon_widgets):
     pontoon_replacements["{{headtcg}}"] = head_tcg_val
 
     return pontoon_replacements
-
