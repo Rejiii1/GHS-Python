@@ -63,7 +63,8 @@ def create_report_tab(notebook):
     widgets["weight_var"] = tk.StringVar(value="Long Tons")
     weight_label_to_value = {
         "Pounds": "LB",
-        "Long Tons": "LT"
+        "Long Tons": "LT",
+        "Short Tons": "ST"
     }
     widgets["weight_label_to_value"] = weight_label_to_value
 

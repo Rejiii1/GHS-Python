@@ -85,7 +85,7 @@ def create_lightship_tab(notebook):
 
             disp_entry = tk.Entry(entry_frame, width=10)
             unit_dropdown = ttk.Combobox(entry_frame, textvariable=unit_var,
-                                         values=["LB", "LT"], state="readonly", width=6)
+                                         values=["LB", "LT", "ST"], state="readonly", width=6)
             ltsh_lcg_entry = tk.Entry(entry_frame, width=10)
             ltsh_tcg_entry = tk.Entry(entry_frame, width=10)
             ltsh_vcg_entry = tk.Entry(entry_frame, width=10)

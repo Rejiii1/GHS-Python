@@ -79,12 +79,14 @@ def collect_lightship_data(lightship_widgets):
 
 
 def collect_loads_data(loads_widgets):
-    """Collects data from the loads tab widgets."""
-    paxct = loads_widgets["pax_count_entry"].get().strip()
+    """Collects data from the loads tab widgets."""   
+    def replace_empty_with_zero(value):
+        return value if value else "0" 
+    paxct = replace_empty_with_zero(loads_widgets["pax_count_entry"].get().strip())
     paxwt = loads_widgets["pax_weight_entry"].get().strip()
-    paxlcg = loads_widgets["pax_lcg_entry"].get().strip()
-    paxtcg = loads_widgets["pax_tcg_entry"].get().strip()
-    paxvcg = loads_widgets["pax_vcg_entry"].get().strip()
+    paxlcg = replace_empty_with_zero(loads_widgets["pax_lcg_entry"].get().strip())
+    paxtcg = replace_empty_with_zero(loads_widgets["pax_tcg_entry"].get().strip())
+    paxvcg = replace_empty_with_zero(loads_widgets["pax_vcg_entry"].get().strip())
 
     addstuff_block = generate_additional_weights_block(loads_widgets["add_weights"])
     macro_block = generate_macro_tanks_block(load_patterns, loads_widgets["load_tanks"])
