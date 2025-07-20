@@ -1,7 +1,7 @@
 """
 GHS_Stability_Generator
 A tool to generate GHS run files for stability analysis
-Version: 3.0.0
+Version: 4.0.0
 Updated: 07-19-2025
 Created by: Trip Jackson
 """
