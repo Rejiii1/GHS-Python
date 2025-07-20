@@ -2,7 +2,7 @@
 It includes functions to gather data from report, lightship, loads, intact, damage & pontoon tabs.
 Used in the Generate Document functionality of the GHS Stability Generator application.
 """
-from utils.generators import (
+from utils.block_builders import (
     generate_initial_weights_block,     #  Lightship Tab
     generate_initial_tanks_block,
     generate_additional_weights_block,  #  Loads Tab
@@ -81,7 +81,7 @@ def collect_lightship_data(lightship_widgets):
 def collect_loads_data(loads_widgets):
     """Collects data from the loads tab widgets."""   
     def replace_empty_with_zero(value):
-        return value if value else "0" 
+        return value if value else "0"
     paxct = replace_empty_with_zero(loads_widgets["pax_count_entry"].get().strip())
     paxwt = loads_widgets["pax_weight_entry"].get().strip()
     paxlcg = replace_empty_with_zero(loads_widgets["pax_lcg_entry"].get().strip())
@@ -159,5 +159,6 @@ def collect_damage_data(damage_widgets):
 
 
 def collect_pontoon_data(pontoon_widgets):
+    """Collects data from the pontoon tab widgets."""
     pontoon_replacements = generate_pontoon_replacements(pontoon_widgets)
     return pontoon_replacements

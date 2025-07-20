@@ -1,24 +1,10 @@
-"""GHS_Stability_Generator
-   A tool to generate GHS run files for stability analysis
-   Version: 1.0.1
-   Updated: 07-16-2025
-   Created by: Trip Jackson
-"""
-import tkinter as tk
-from tkinter import ttk, messagebox
+"""This module handles the generation of GHS run files based on user input."""
+from tkinter import messagebox
 import os
+from pathlib import Path
 
+from utils.block_builders import resolve_output_directory
 
-#GUI
-#tabs
-from tabs.tab_report import create_report_tab
-from tabs.tab_lightship import create_lightship_tab
-from tabs.tab_loads import create_loads_tab
-from tabs.tab_intact import create_intact_tab
-from tabs.tab_pontoon import build_pontoon_tab
-from tabs.tab_damage import create_damage_tab
-
-from utils.generators import resolve_output_directory
 
 # Input Collector
 from utils.input_collector import (
@@ -30,14 +16,35 @@ from utils.input_collector import (
     collect_pontoon_data
 )
 
+# Path to the templates directory
+TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
+
 def load_template_file(filename):
-    """Loads a template file from the templates directory."""
-    template_dir = os.path.join(os.path.dirname(__file__), "templates")
+    """Loads a template file from the templates directory located in the project root."""
+    project_root = os.path.dirname(os.path.dirname(__file__))  # One level up
+    template_dir = os.path.join(project_root, "templates")
     path = os.path.join(template_dir, filename)
+
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Template file not found: {path}")
+
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
 
-def generate_document():
+
+def generate_document(
+    report_widgets,
+    lightship_widgets,
+    loads_widgets,
+    intact_widgets,
+    route_var,
+    route_label_to_value,
+    vessel_var,
+    vessel_label_to_value,
+    damage_widgets,
+    pontoon_widgets,
+    root
+):
     """Collects data from all tabs and generates GHS run files."""
     report_data = collect_report_data(report_widgets)
     lightship_data = collect_lightship_data(lightship_widgets)
@@ -126,65 +133,3 @@ def generate_document():
 
     messagebox.showinfo("Success", f"All files saved in:\n{output_dir}")
     root.destroy()
-
-# GUI setup
-# === SETUP ROOT ===
-root = tk.Tk()
-root.title("GHS Run File Creator")
-root.geometry("600x800")
-
-notebook = ttk.Notebook(root)
-notebook.pack(fill="both", expand=True)
-
-# === TAB 1: Report Details ===
-report_widgets = create_report_tab(notebook)
-# === TAB 2: Lightship ===
-lightship_frame, lightship_widgets = create_lightship_tab(notebook)
-# === TAB 3: Loads ===
-loads_tab, loads_widgets = create_loads_tab(notebook)
-# === TAB 4: Intact Stability ===
-vessel_var = tk.StringVar(value="Select a vessel type")
-vessel_label_to_value = {
-    "Power Boat": "POWER",
-    "Pontoon Boat": "PONTOON",
-    "RHIB": "RHIB",
-    "Monohull Sailboat": "MONOSAIL",
-    "Catamaran Sailboat": "CATSAIL"
-}
-route_var = tk.StringVar(value="Select a route")
-route_label_to_value = {
-    "Protected Waters": "PROTECT",
-    "Partially Protected Waters": "PARTIAL",
-    "Exposed Waters": "EXPOSED"
-}
-intact_widgets = create_intact_tab(
-    notebook, vessel_var, vessel_label_to_value, route_var, route_label_to_value
-)
-# === TAB 4.5: Pontoon Stability ==
-pontoon_tab = None
-pontoon_widgets = None  # To hold crowd/head entries if you want later
-
-def update_pontoon_tab(*args):
-    """Updates the Pontoon tab based on the selected vessel type."""
-    global pontoon_tab, pontoon_widgets
-    if vessel_var.get() == "Pontoon Boat" and pontoon_tab is None:
-        pontoon_tab, pontoon_widgets = build_pontoon_tab(notebook)
-    elif vessel_var.get() != "Pontoon Boat" and pontoon_tab is not None:
-        notebook.forget(pontoon_tab)
-        pontoon_tab = None
-        pontoon_widgets = None
-# Hook the trace *after* creating the combobox
-vessel_var.trace_add("write", update_pontoon_tab)
-# Call once in case default is already "Pontoon Boat"
-update_pontoon_tab()
-
-# === TAB 5: Damage Stability ===
-damage_widgets = create_damage_tab(notebook)
-
-# === Bottom Button ===
-bottom_frame = tk.Frame(root)
-bottom_frame.pack(side="bottom", fill="x")
-tk.Button(bottom_frame, text="Generate Run Files", command=generate_document).pack(pady=10)
-
-# Start GUI
-root.mainloop()

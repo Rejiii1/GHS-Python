@@ -34,6 +34,9 @@ contents_to_sg = {
     "Gasoline": "0.74",
     "Fresh Water": "1.00",
     "Sewage": "1.025",
-    "Diesel": "0.85",
-    "Bait": "1.025"
+    "Fuel Oil": "0.87",
+    "Diesel": "0.87",
+    "Bait": "1.025",
+    "Hydraulic Oil": "0.924",
+    "Lube Oil": "0.924"
 }

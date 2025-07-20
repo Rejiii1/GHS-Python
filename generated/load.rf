@@ -1,12 +1,12 @@
 Clear
 run ls.rf /call /quiet
 `===============================================================
-	set PAXCT	= 		`Max number of Passengers
+	set PAXCT	= 0		`Max number of Passengers
 	set PAXWT	= 185		`Avg Pax Weight
 `--------Locations-----------
-	set PAXLCG	= 		`LCG of Normal Pax loading
-	set PAXTCG	= 		`TCG of Noramal Pax
-	set PAXVCG	= 		`VCG of Normal Pax
+	set PAXLCG	= 0		`LCG of Normal Pax loading
+	set PAXTCG	= 0		`TCG of Noramal Pax
+	set PAXVCG	= 0		`VCG of Normal Pax
 `===============================================================
 `----------SET UP TANK CONTENTS---------- `USUALLY DON'T NEED THIS SECTION UNLESS CONTESTING TANK CONTENTS IN SUBMISSION
 `SET TANK CONTENTS SP GRAVITY	`NEED TO COMMENT OUT TANKS THAT DON'T APPLY HERE
